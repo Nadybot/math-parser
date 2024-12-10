@@ -11,7 +11,7 @@ class LexerTest extends TestCase
 {
     private $lexer;
 
-    public function setUp()
+    public function setUp(): void
     {
         $lexer = new Lexer();
 

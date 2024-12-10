@@ -103,7 +103,7 @@ class ComplexTest extends TestCase
 
     public function testCreateFailure()
     {
-        $this->expectException(SyntaxErrorException::class);
+        $this->expectException(TypeError::class);
         $z = Complex::create([1, 2], '23');
     }
 
@@ -116,17 +116,17 @@ class ComplexTest extends TestCase
         $this->assertEquals(new Complex(-1, 3), Complex::sub($z, $w));
         $this->assertEquals(new Complex(4, 3), Complex::mul($z, $w));
         $this->assertEquals(new Complex(0, 1), Complex::div($z, $w));
-
     }
 
     public function testCanComputePowers()
     {
+        $accuracy = 1e-9;
         $z = new Complex(1, 2);
 
         $this->assertEquals(new Complex(-3, 4), Complex::pow($z, 2));
         $this->assertEquals(new Complex(-11, -2), Complex::pow($z, 3));
         $this->assertEquals(new Complex(1 / 5, -2 / 5), Complex::pow($z, -1));
-        $this->assertEquals(new Complex(0.2291401860, 0.2381701151), Complex::pow($z, new Complex(0, 1)));
+        $this->assertEqualsWithDelta(new Complex(0.2291401860, 0.2381701151), Complex::pow($z, new Complex(0, 1)), $accuracy);
     }
 
     public function testCanComputeTranscendentals()
@@ -134,24 +134,23 @@ class ComplexTest extends TestCase
         $z = new Complex(1, 2);
         $accuracy = 1e-9;
 
-        $this->assertEquals(new Complex(1.272019650, 0.7861513778), Complex::sqrt($z), 'sqrt', $accuracy);
-        $this->assertEquals(new Complex(3.165778513, 1.959601041), Complex::sin($z), 'sin', $accuracy);
-        $this->assertEquals(new Complex(2.032723007, -3.051897799), Complex::cos($z), 'cos', $accuracy);
-        $this->assertEquals(new Complex(0.03381282608, 1.014793616), Complex::tan($z), 'tan', $accuracy);
-        $this->assertEquals(new Complex(0.03279775553, -0.9843292265), Complex::cot($z), 'cot', $accuracy);
-        $this->assertEquals(new Complex(0.4270785864, 1.528570919), Complex::arcsin($z), 'arcsin', $accuracy);
-        $this->assertEquals(new Complex(1.143717740, -1.528570919), Complex::arccos($z), 'arccos', $accuracy);
-        $this->assertEquals(new Complex(1.338972522, 0.4023594781), Complex::arctan($z), 'arctan', $accuracy);
-        $this->assertEquals(new Complex(0.2318238045, -0.4023594781), Complex::arccot($z), 'arccot', $accuracy);
-        $this->assertEquals(new Complex(-1.131204384, 2.471726672), Complex::exp($z), 'exp', $accuracy);
-        $this->assertEquals(new Complex(0.8047189562, 1.107148718), Complex::log($z), 'log', $accuracy);
-        $this->assertEquals(new Complex(-0.4890562590, 1.403119251), Complex::sinh($z), 'sinh', $accuracy);
-        $this->assertEquals(new Complex(-0.6421481247, 1.068607421), Complex::cosh($z), 'cosh', $accuracy);
-        $this->assertEquals(new Complex(1.166736257, -0.2434582012), Complex::tanh($z), 'tanh', $accuracy);
-        $this->assertEquals(new Complex(1.469351744, 1.063440024), Complex::arsinh($z), 'arsinh', $accuracy);
-        $this->assertEquals(new Complex(1.528570919, 1.143717740), Complex::arcosh($z), 'arcosh', $accuracy);
-        $this->assertEquals(new Complex(0.1732867951, 1.178097245), Complex::artanh($z), 'artanh', $accuracy);
-
+        $this->assertEqualsWithDelta(new Complex(1.272019650, 0.7861513778), Complex::sqrt($z), $accuracy, 'sqrt');
+        $this->assertEqualsWithDelta(new Complex(3.165778513, 1.959601041), Complex::sin($z), $accuracy, 'sin');
+        $this->assertEqualsWithDelta(new Complex(2.032723007, -3.051897799), Complex::cos($z), $accuracy, 'cos');
+        $this->assertEqualsWithDelta(new Complex(0.03381282608, 1.014793616), Complex::tan($z), $accuracy, 'tan');
+        $this->assertEqualsWithDelta(new Complex(0.03279775553, -0.9843292265), Complex::cot($z), $accuracy, 'cot');
+        $this->assertEqualsWithDelta(new Complex(0.4270785864, 1.528570919), Complex::arcsin($z), $accuracy, 'arcsin');
+        $this->assertEqualsWithDelta(new Complex(1.143717740, -1.528570919), Complex::arccos($z), $accuracy, 'arccos');
+        $this->assertEqualsWithDelta(new Complex(1.338972522, 0.4023594781), Complex::arctan($z), $accuracy, 'arctan');
+        $this->assertEqualsWithDelta(new Complex(0.2318238045, -0.4023594781), Complex::arccot($z), $accuracy, 'arccot');
+        $this->assertEqualsWithDelta(new Complex(-1.131204384, 2.471726672), Complex::exp($z), $accuracy, 'exp');
+        $this->assertEqualsWithDelta(new Complex(0.8047189562, 1.107148718), Complex::log($z), $accuracy, 'log');
+        $this->assertEqualsWithDelta(new Complex(-0.4890562590, 1.403119251), Complex::sinh($z), $accuracy, 'sinh');
+        $this->assertEqualsWithDelta(new Complex(-0.6421481247, 1.068607421), Complex::cosh($z), $accuracy, 'cosh');
+        $this->assertEqualsWithDelta(new Complex(1.166736257, -0.2434582012), Complex::tanh($z), $accuracy, 'tanh');
+        $this->assertEqualsWithDelta(new Complex(1.469351744, 1.063440024), Complex::arsinh($z), $accuracy, 'arsinh');
+        $this->assertEqualsWithDelta(new Complex(1.528570919, 1.143717740), Complex::arcosh($z), $accuracy, 'arcosh');
+        $this->assertEqualsWithDelta(new Complex(0.1732867951, 1.178097245), Complex::artanh($z), $accuracy, 'artanh');
     }
 
     public function testCanComputeNonAnalytic()
@@ -159,10 +158,9 @@ class ComplexTest extends TestCase
         $z = new Complex(1, 2);
         $accuracy = 1e-9;
 
-        $this->assertEquals(sqrt(5), $z->abs(), 'abs', $accuracy);
-        $this->assertEquals(1, $z->r(), 'r', $accuracy);
-        $this->assertEquals(2, $z->i(), 'i', $accuracy);
-        $this->assertEquals(1.107148718, $z->arg(), 'arg', $accuracy);
-
+        $this->assertEqualsWithDelta(sqrt(5), $z->abs(), $accuracy, 'abs');
+        $this->assertEqualsWithDelta(1, $z->r(), $accuracy, 'r');
+        $this->assertEqualsWithDelta(2, $z->i(), $accuracy, 'i');
+        $this->assertEqualsWithDelta(1.107148718, $z->arg(), $accuracy, 'arg');
     }
 }

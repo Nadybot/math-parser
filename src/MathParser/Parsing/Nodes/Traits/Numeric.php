@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
 * @package     Parsing
 * @author      Frank Wikström <frank@mossadal.se>
@@ -11,11 +13,13 @@
  *
  * Traits for Nodes
  */
+
 namespace MathParser\Parsing\Nodes\Traits;
 
 use MathParser\Parsing\Nodes\Node;
 use MathParser\Parsing\Nodes\NumberNode;
 use MathParser\Parsing\Nodes\IntegerNode;
+use MathParser\Parsing\Nodes\NumericNode;
 use MathParser\Parsing\Nodes\RationalNode;
 
 /**
@@ -24,22 +28,28 @@ use MathParser\Parsing\Nodes\RationalNode;
  * with numbers, making the code cleaner.
  *
  */
-trait Numeric {
-    protected function isNumeric($operand)
+trait Numeric
+{
+    protected function isNumeric(?Node $operand): bool
     {
-        return ($operand instanceof NumberNode || $operand instanceof IntegerNode || $operand instanceof RationalNode);
-
+        return ($operand instanceof NumericNode);
     }
 
-    protected function orderType($node)
+    protected function orderType(?Node $node): int
     {
-        if ($node instanceof IntegerNode) return Node::NumericInteger;
-        if ($node instanceof RationalNode) return Node::NumericRational;
-        if ($node instanceof NumberNode) return Node::NumericFloat;
+        if ($node instanceof IntegerNode) {
+            return Node::NumericInteger;
+        }
+        if ($node instanceof RationalNode) {
+            return Node::NumericRational;
+        }
+        if ($node instanceof NumberNode) {
+            return Node::NumericFloat;
+        }
 
         return 0;
     }
-    protected function resultingType($node, $other)
+    protected function resultingType(NumericNode $node, NumericNode $other): int
     {
         return max($this->orderType($node), $this->orderType($other));
     }

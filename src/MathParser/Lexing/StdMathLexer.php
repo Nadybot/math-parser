@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * Short description
  *
@@ -134,6 +136,5 @@ class StdMathLexer extends Lexer
 
         $this->add(new TokenDefinition('/\n/', TokenType::Terminator));
         $this->add(new TokenDefinition('/\s+/', TokenType::Whitespace));
-
     }
 }

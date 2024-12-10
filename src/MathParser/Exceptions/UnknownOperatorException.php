@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @package     Exceptions
  * @author      Frank Wikström <frank@mossadal.se>
@@ -7,18 +9,18 @@
  *
  */
 
- namespace MathParser\Exceptions;
+namespace MathParser\Exceptions;
 
- /**
-  * Exception thrown when parsing or evaluating expressions containing an
-  * unknown oprator.
-  *
-  * This should not happen under normal circumstances.
-  */
+/**
+ * Exception thrown when parsing or evaluating expressions containing an
+ * unknown oprator.
+ *
+ * This should not happen under normal circumstances.
+ */
 class UnknownOperatorException extends MathParserException
 {
     /** Constructor. Create a UnknownOperatorException */
-    public function __construct($operator)
+    public function __construct(string $operator)
     {
         parent::__construct("Unknown operator $operator.");
 
@@ -27,10 +29,8 @@ class UnknownOperatorException extends MathParserException
 
     /**
      * Get the unkown operator that was encountered.
-     *
-     * @return string
      */
-    public function getOperator()
+    public function getOperator(): string
     {
         return $this->data;
     }

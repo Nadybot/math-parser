@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @package     Rational
  * @author      Frank Wikström <frank@mossadal.se>
@@ -6,6 +8,7 @@
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  *
  */
+
 namespace MathParser\Extensions;
 
 use MathParser\Exceptions\SyntaxErrorException;
@@ -26,15 +29,6 @@ use MathParser\Exceptions\DivisionByZeroException;
 class Rational
 {
     /**
-     * int $p numerator
-     */
-    public $p;
-    /**
-     * int $q denominator
-     */
-    public $q;
-
-    /**
      * Constuctor for Rational number class
      *
      * $r = new Rational(2, 4)         // creates 1/2
@@ -45,24 +39,31 @@ class Rational
      * @param bool $normalize (default true) If true, store in normalized form,
      *             i.e. positive denominator and gcd($p, $q) = 1
      */
-    public function __construct($p, $q, $normalize=true) {
-        $this->p = $p;
-        $this->q = $q;
+    public function __construct(
+        public float $p,
+        public float $q,
+        bool $normalize=true
+    ) {
+        if ($q === 0 || $q === 0.0) {
+            throw new DivisionByZeroException();
+        }
 
-        if ($q == 0) throw new DivisionByZeroException();
-
-        if ($normalize) $this->normalize();
+        if ($normalize) {
+            $this->normalize();
+        }
     }
 
     /**
      * Normalize, i.e. make sure the denominator is positive and that
      * the numerator and denominator have no common factors
      */
-    private function normalize()
+    private function normalize(): void
     {
         $gcd = Math::gcd($this->p, $this->q);
 
-        if ($gcd == 0) throw new DivisionByZeroException();
+        if ($gcd === 0) {
+            throw new DivisionByZeroException();
+        }
 
         $this->p = $this->p/$gcd;
         $this->q = $this->q/$gcd;
@@ -74,168 +75,151 @@ class Rational
     }
 
     /**
-     * add two rational numbers
+     * Add two rational numbers
      *
      * Rational::add($x, $y) computes and returns $x+$y
-     *
-     *
-     * @param mixed $x (Rational, or parsable to Rational)
-     * @param mixed $y (Rational, or parsable to Rational)
-     * @return Rational
      */
-    public static function add($x, $y)
+    public static function add(string|int|float|Rational $x, string|int|float|Rational $y): Rational
     {
-        $X = static::parse($x);
-        $Y = static::parse($y);
+        $xRat = static::parse($x);
+        $yRat = static::parse($y);
 
-        $resp = $X->p * $Y->q + $X->q * $Y->p;
-        $resq = $X->q * $Y->q;
+        $resp = $xRat->p * $yRat->q + $xRat->q * $yRat->p;
+        $resq = $xRat->q * $yRat->q;
 
         return new Rational($resp, $resq);
     }
 
     /**
-     * subtract two rational numbers
+     * Subtract two rational numbers
      *
      * Rational::sub($x, $y) computes and returns $x-$y
-     *
-     *
-     * @param mixed $x (Rational, or parsable to Rational)
-     * @param mixed $y (Rational, or parsable to Rational)
-     * @return Rational
      */
-    public static function sub($x, $y)
+    public static function sub(string|int|float|Rational $x, string|int|float|Rational $y): Rational
     {
-        $X = static::parse($x);
-        $Y = static::parse($y);
+        $xRat = static::parse($x);
+        $yRat = static::parse($y);
 
-        $resp = $X->p * $Y->q - $X->q * $Y->p;
-        $resq = $X->q * $Y->q;
+        $resp = $xRat->p * $yRat->q - $xRat->q * $yRat->p;
+        $resq = $xRat->q * $yRat->q;
 
         return new Rational($resp, $resq);
     }
 
     /**
-     * multiply two rational numbers
+     * Multiply two rational numbers
      *
      * Rational::mul($x, $y) computes and returns $x*$y
-     *
-     *
-     * @param mixed $x (Rational, or parsable to Rational)
-     * @param mixed $y (Rational, or parsable to Rational)
-     * @return Rational
      */
-    public static function mul($x, $y)
+    public static function mul(string|int|float|Rational $x, string|int|float|Rational $y): Rational
     {
-        $X = static::parse($x);
-        $Y = static::parse($y);
+        $xRat = static::parse($x);
+        $yRat = static::parse($y);
 
-        $resp = $X->p * $Y->p;
-        $resq = $X->q * $Y->q;
+        $resp = $xRat->p * $yRat->p;
+        $resq = $xRat->q * $yRat->q;
 
         return new Rational($resp, $resq);
     }
 
     /**
-     * add two rational numbers
+     * Divide two rational numbers
      *
      * Rational::div($x, $y) computes and returns $x/$y
-     *
-     *
-     * @param mixed $x (Rational, or parsable to Rational)
-     * @param mixed $y (Rational, or parsable to Rational)
-     * @return Rational
      */
-    public static function div($x, $y)
+    public static function div(string|int|float|Rational $x, string|int|float|Rational $y): Rational
     {
-        $X = static::parse($x);
-        $Y = static::parse($y);
+        $xRat = static::parse($x);
+        $yRat = static::parse($y);
 
-        if ($Y->p == 0) throw new DivisionByZeroException();
+        if ($yRat->p == 0) {
+            throw new DivisionByZeroException();
+        }
 
-        $resp = $X->p * $Y->q;
-        $resq = $X->q * $Y->p;
+        $resp = $xRat->p * $yRat->q;
+        $resq = $xRat->q * $yRat->p;
 
         return new Rational($resp, $resq);
     }
 
     /**
      * convert rational number to string, adding a '+' if the number is positive
-     *
-     * @return string
      */
-    public function signed()
+    public function signed(): string
     {
-
         if ($this->q == 1) {
             return sprintf("%+d", $this->p);
         }
         return sprintf("%+d/%d", $this->p, $this->q);
-
     }
 
     /**
-     * test whether a string represents an positive integer
-     *
-     * @return bool
+     * Test whether a string represents an positive integer
      */
-    private static function isInteger($value)
+    private static function isInteger(string $value): bool
     {
-        return preg_match('~^\d+$~', $value);
+        return ctype_digit($value);
     }
 
     /**
-     * test whether a string represents a signed integer
-     *
-     * @return bool
+     * Test whether a string represents a signed integer
      */
-    private static function isSignedInteger($value)
+    private static function isSignedInteger($value): bool
     {
-        return preg_match('~^\-?\d+$~', $value);
+        return is_int(filter_var($value, FILTER_VALIDATE_INT));
     }
 
     /**
-     * test if the rational number is NAN
-     *
-     * @return bool
+     * Test if the rational number is NAN
      */
-    public function is_nan()
+    public function is_nan(): bool
     {
-        if ($this->q == 0) return true;
+        if ($this->q === 0 || $this->q === 0.0) {
+            return true;
+        }
         return is_nan($this->p) || is_nan($this->q);
     }
 
     /**
      * Convert $value to Rational
      *
-     * @param $value mixed
      * @throws SyntaxErrorException
-     * @return Rational
      */
-    public static function parse($value, $normalize=true)
+    public static function parse(string|int|float|Rational $value, bool $normalize=true): Rational
     {
-        if ($value === '') return null;
-        if ($value === 'NAN') return new Rational(NAN, 1);
-        if ($value === 'INF') return new Rational(INF, 1);
-        if ($value === '-INF') return new Rational(-INF, 1);
+        if ($value instanceof Rational) {
+            return $value;
+        }
+        if ($value === '') {
+            return null;
+        }
+        if ($value === 'NAN') {
+            return new Rational(NAN, 1);
+        }
+        if ($value === 'INF') {
+            return new Rational(INF, 1);
+        }
+        if ($value === '-INF') {
+            return new Rational(-INF, 1);
+        }
 
         $data = $value;
 
         $numbers = explode('/', $data);
-        if (count($numbers) == 1) {
+        if (count($numbers) === 1) {
             $p = static::isSignedInteger($numbers[0]) ? intval($numbers[0]) : NAN;
             $q = 1;
-        }
-        elseif (count($numbers) != 2) {
+        } elseif (count($numbers) !== 2) {
             $p = NAN;
             $q = NAN;
-        }
-        else {
+        } else {
             $p = static::isSignedInteger($numbers[0]) ? intval($numbers[0]) : NAN;
-            $q = static::isInteger($numbers[1]) ? intval($numbers[1]) : NAN;
+            $q = ctype_digit($numbers[1]) ? intval($numbers[1]) : NAN;
         }
 
-        if (is_nan($p) || is_nan($q)) throw new SyntaxErrorException();
+        if (is_nan($p) || is_nan($q)) {
+            throw new SyntaxErrorException();
+        }
 
 
         return new Rational($p, $q, $normalize);
@@ -245,19 +229,18 @@ class Rational
      * convert float to Rational
      *
      * Convert float to a continued fraction, with prescribed accuracy
-     *
-     * @param string|float $float
-     * @param float $tolerance
-     * @return Rational
      */
-    public static function fromFloat($float, $tolerance=1e-7)
+    public static function fromFloat(string|int|float $float, float $tolerance=1e-7): Rational
     {
         if (is_string($float) && preg_match('~^\-?\d+([,|.]\d+)?$~', $float)) {
-            $float = floatval(str_replace(',','.',$float));
+            $float = floatval(str_replace(',', '.', $float));
+        }
+        if (is_int($float)) {
+            $float = (float)$float;
         }
 
-        if ($float == 0.0) {
-            return new Rational(0,1);
+        if ($float === 0.0) {
+            return new Rational(0, 1);
         }
         $negative = ($float < 0);
         if ($negative) {
@@ -288,12 +271,12 @@ class Rational
 
     /**
      * Convert Rational to string
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
-        if ($this->q == 1) return "$this->p";
+        if ($this->q === 1 || $this->q === 1.0) {
+            return "$this->p";
+        }
         return "$this->p/$this->q";
     }
 }

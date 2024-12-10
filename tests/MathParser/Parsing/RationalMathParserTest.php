@@ -19,13 +19,13 @@ use PHPUnit\Framework\TestCase;
 
 class RationalMathParserTest extends TestCase
 {
-    private $parser;
+    private RationalMathParser $parser;
+    private NodeFactory $factory;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->parser = new RationalMathParser();
         $this->factory = new NodeFactory();
-
     }
 
     private function assertNodesEqual($node1, $node2)
@@ -93,7 +93,6 @@ class RationalMathParserTest extends TestCase
         $this->assertTokenEquals("x", TokenType::Identifier, $tokens[0]);
         $this->assertTokenEquals("+", TokenType::AdditionOperator, $tokens[1]);
         $this->assertTokenEquals("y", TokenType::Identifier, $tokens[2]);
-
     }
 
     public function testCanGetTree()
@@ -116,7 +115,6 @@ class RationalMathParserTest extends TestCase
         $node = $this->parser->parse("3.5");
         $shouldBe = new NumberNode(3.5);
         $this->assertNodesEqual($node, $shouldBe);
-
     }
 
     public function testCanParseSingleVariable()
@@ -221,7 +219,6 @@ class RationalMathParserTest extends TestCase
             new ExpressionNode(new VariableNode('y'), '^', new VariableNode('z'))
         );
         $this->assertNodesEqual($node, $shouldBe);
-
     }
 
     public function testCanParseWithCorrectPrecedence()
@@ -296,7 +293,6 @@ class RationalMathParserTest extends TestCase
         $node = $this->parser->parse("(x+1)(x-1)");
         $shouldBe = $this->parser->parse("(x+1)*(x-1)");
         $this->assertNodesEqual($node, $shouldBe);
-
     }
 
     public function testCanParseUnaryOperators()
@@ -336,7 +332,6 @@ class RationalMathParserTest extends TestCase
         $node = $this->parser->parse("-(1/2)");
         $shouldBe = new RationalNode(-1, 2);
         $this->assertNodesEqual($node, $shouldBe);
-
     }
 
     public function testSyntaxErrorException()
@@ -385,7 +380,6 @@ class RationalMathParserTest extends TestCase
 
         $f = $this->parser->parse('(1/2)/(1/3)');
         $this->assertTrue($f->compareTo(new RationalNode(3, 2)));
-
     }
 
     public function testAdditionNodeFactory()
@@ -637,7 +631,6 @@ class RationalMathParserTest extends TestCase
         $node = $this->factory->multiplication(new IntegerNode(1), new IntegerNode(2));
         $shouldBe = new IntegerNode(2);
         $this->assertNodesEqual($node, $shouldBe);
-
     }
 
     public function testSubtractionNodeFactory()
@@ -702,7 +695,5 @@ class RationalMathParserTest extends TestCase
         $node = $this->factory->subtraction($op1, null);
         $shouldBe = new VariableNode('x');
         $this->assertNodesEqual($node, $shouldBe);
-
     }
-
 }

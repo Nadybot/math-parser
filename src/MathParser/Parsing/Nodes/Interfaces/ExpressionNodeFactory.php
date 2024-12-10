@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
 * @package     Parsing
 * @author      Frank Wikström <frank@mossadal.se>
@@ -12,8 +14,10 @@
  *
  * Interfaces for Nodes, in particular Node factories.
  */
+
 namespace MathParser\Parsing\Nodes\Interfaces;
 
+use MathParser\Parsing\Nodes\Node;
 
 /**
  * Interface for construction of ExpressionNode, the
@@ -25,10 +29,6 @@ interface ExpressionNodeFactory
 {
     /**
     * Factory method to create an ExpressionNode with given operands.
-    *
-    * @param mixed $leftOperand
-    * @param mixed $rightOperand
-    * @retval ExpressionNode|NumberNode
     */
-    public function makeNode($leftOperand, $rightOperand);
+    public function makeNode(int|Node $leftOperand, int|Node $rightOperand): Node;
 }

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * Visitable interface
  *
@@ -21,6 +23,7 @@
  * - *Visitor* should be implemented by AST transformers, and consists of one function
  *      for each subclass of Node, i.e. `visitXXXNode()`
  */
+
 namespace MathParser\Interpreting\Visitors;
 
 /**
@@ -52,5 +55,5 @@ interface Visitable
      *
      * @param Visitor $visitor
      **/
-    function accept(Visitor $visitor);
+    public function accept(Visitor $visitor): mixed;
 }

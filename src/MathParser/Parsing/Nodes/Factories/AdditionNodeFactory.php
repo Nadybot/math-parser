@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
 * @package     Parsing
 * @author      Frank Wikström <frank@mossadal.se>
@@ -17,6 +19,7 @@ use MathParser\Parsing\Nodes\IntegerNode;
 use MathParser\Parsing\Nodes\RationalNode;
 
 use MathParser\Parsing\Nodes\ExpressionNode;
+use MathParser\Parsing\Nodes\NumericNode;
 use MathParser\Parsing\Nodes\Traits\Sanitize;
 use MathParser\Parsing\Nodes\Traits\Numeric;
 
@@ -45,46 +48,48 @@ class AdditionNodeFactory implements ExpressionNodeFactory
     *
     * @param Node|int $leftOperand First term
     * @param Node|int $rightOperand Second term
-    * @retval Node
     */
-    public function makeNode($leftOperand, $rightOperand)
+    public function makeNode(Node|int $leftOperand, Node|int $rightOperand): Node
     {
         $leftOperand = $this->sanitize($leftOperand);
         $rightOperand = $this->sanitize($rightOperand);
 
         $node = $this->numericTerms($leftOperand, $rightOperand);
-        if ($node) return $node;
+        if ($node) {
+            return $node;
+        }
 
         return new ExpressionNode($leftOperand, '+', $rightOperand);
     }
 
-    /** Simplify addition node when operands are numeric
-    *
-    * @param Node $leftOperand
-    * @param Node $rightOperand
-    * @retval Node|null
-    */
-    protected function numericTerms($leftOperand, $rightOperand)
+    /** Simplify addition node when operands are numeric */
+    protected function numericTerms(Node $leftOperand, Node $rightOperand): ?Node
     {
-        if ($this->isNumeric($leftOperand) && $leftOperand->getValue() == 0) return $rightOperand;
-        if ($this->isNumeric($rightOperand) && $rightOperand->getValue() == 0) return $leftOperand;
+        if (($leftOperand instanceof NumericNode) && $leftOperand->getValue() == 0) {
+            return $rightOperand;
+        }
+        if (($rightOperand instanceof NumericNode) && $rightOperand->getValue() == 0) {
+            return $leftOperand;
+        }
 
-        if (!$this->isNumeric($leftOperand) || !$this->isNumeric($rightOperand)) {
+        if (!($leftOperand instanceof NumericNode) || !($rightOperand instanceof NumericNode)) {
             return null;
         }
         $type = $this->resultingType($leftOperand, $rightOperand);
 
-        switch($type) {
+        switch ($type) {
             case Node::NumericFloat:
-            return new NumberNode($leftOperand->getValue() + $rightOperand->getValue());
+                return new NumberNode($leftOperand->getValue() + $rightOperand->getValue());
 
             case Node::NumericRational:
-            $p = $leftOperand->getNumerator() * $rightOperand->getDenominator() + $leftOperand->getDenominator() * $rightOperand->getNumerator();
-            $q = $leftOperand->getDenominator() * $rightOperand->getDenominator();
-            return new RationalNode($p, $q);
+                assert($leftOperand instanceof RationalNode);
+                assert($rightOperand instanceof RationalNode);
+                $p = $leftOperand->getNumerator() * $rightOperand->getDenominator() + $leftOperand->getDenominator() * $rightOperand->getNumerator();
+                $q = $leftOperand->getDenominator() * $rightOperand->getDenominator();
+                return new RationalNode($p, $q);
 
             case Node::NumericInteger:
-            return new IntegerNode($leftOperand->getValue() + $rightOperand->getValue());
+                return new IntegerNode($leftOperand->getValue() + $rightOperand->getValue());
         }
 
 

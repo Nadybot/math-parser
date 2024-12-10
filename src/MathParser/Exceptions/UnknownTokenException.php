@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @package     Exceptions
  * @author      Frank Wikström <frank@mossadal.se>
@@ -7,16 +9,16 @@
  *
  */
 
- namespace MathParser\Exceptions;
+namespace MathParser\Exceptions;
 
- /**
-  * Exception thrown when tokenizing expressions containing illegal
-  * characters.
-  */
+/**
+ * Exception thrown when tokenizing expressions containing illegal
+ * characters.
+ */
 class UnknownTokenException extends MathParserException
 {
     /** Constructor. Create a UnknownTokenException */
-    public function __construct($name)
+    public function __construct(string $name)
     {
         parent::__construct("Unknown token $name encountered");
 
@@ -25,11 +27,9 @@ class UnknownTokenException extends MathParserException
 
     /**
      * Get the unknown token that was encountered.
-     *
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
-    	return $this->data;
+        return $this->data;
     }
 }

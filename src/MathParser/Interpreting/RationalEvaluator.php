@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @author      Frank Wikström <frank@mossadal.se>
  * @copyright   2016 Frank Wikström
@@ -14,7 +16,6 @@ use MathParser\Exceptions\UnknownOperatorException;
 use MathParser\Exceptions\UnknownVariableException;
 use MathParser\Extensions\Math;
 use MathParser\Interpreting\Visitors\Visitor;
-use MathParser\Lexer\StdMathLexer;
 use MathParser\Parsing\Nodes\ConstantNode;
 use MathParser\Parsing\Nodes\ExpressionNode;
 use MathParser\Parsing\Nodes\FunctionNode;
@@ -50,33 +51,34 @@ use MathParser\Parsing\Nodes\VariableNode;
 class RationalEvaluator implements Visitor
 {
     /**
-     * mixed[] $variables Key/value pair holding current values
-     *      of the variables used for evaluating.
+     * Key/value pair holding current values
+     * of the variables used for evaluating.
      *
+     * @var array<string,RationalNode>
      */
-    private $variables;
+    private array $variables;
 
     /**
      * Constructor. Create an Evaluator with given variable values.
      *
-     * @param mixed $variables key-value array of variables with corresponding values.
+     * @param array<string,RationalNode|string> $variables key-value array of variables with corresponding values.
      */
-    public function __construct($variables = null)
+    public function __construct(array $variables=[])
     {
         $this->setVariables($variables);
     }
 
-    private function isInteger($value)
+    private function isInteger($value): bool
     {
-        return preg_match('~^\d+$~', $value);
+        return ctype_digit($value);
     }
 
-    private function isSignedInteger($value)
+    private function isSignedInteger($value): bool
     {
-        return preg_match('~^\-?\d+$~', $value);
+        return is_int(filter_var($value, FILTER_VALIDATE_INT));
     }
 
-    public function parseRational($value)
+    public function parseRational(string $value): RationalNode
     {
         $data = $value;
 
@@ -102,10 +104,9 @@ class RationalEvaluator implements Visitor
     /**
      * Update the variables used for evaluating
      *
-     * @return void
-     * @param array $variables Key/value pair holding current variable values
+     * @param array<string,RationalNode|string> $variables Key/value pair holding current variable values
      */
-    public function setVariables($variables)
+    public function setVariables(array $variables): void
     {
         $this->variables = [];
         foreach ($variables as $var => $value) {
@@ -126,11 +127,10 @@ class RationalEvaluator implements Visitor
      * where `op` is one of `+`, `-`, `*`, `/` or `^`
      *
      *      `+`, `-`, `*`, `/` or `^`
-     * @return float
      * @param  ExpressionNode           $node AST to be evaluated
      * @throws UnknownOperatorException if the operator is something other than
      */
-    public function visitExpressionNode(ExpressionNode $node)
+    public function visitExpressionNode(ExpressionNode $node): RationalNode
     {
         $operator = $node->getOperator();
 
@@ -183,20 +183,19 @@ class RationalEvaluator implements Visitor
      *
      * Retuns the value of an NumberNode
      *
-     * @return float
      * @param NumberNode $node AST to be evaluated
      */
-    public function visitNumberNode(NumberNode $node)
+    public function visitNumberNode(NumberNode $node): never
     {
         throw new \UnexpectedValueException("Expecting rational number");
     }
 
-    public function visitIntegerNode(IntegerNode $node)
+    public function visitIntegerNode(IntegerNode $node): RationalNode
     {
         return new RationalNode($node->getValue(), 1);
     }
 
-    public function visitRationalNode(RationalNode $node)
+    public function visitRationalNode(RationalNode $node): RationalNode
     {
         return $node;
     }
@@ -208,13 +207,12 @@ class RationalEvaluator implements Visitor
      * either by the constructor or set using the `Evaluator::setVariables()` method.
      *
      *      VariableNode is *not* set.
-     * @return float
      * @see Evaluator::setVariables() to define the variables
      *
      * @param  VariableNode             $node AST to be evaluated
      * @throws UnknownVariableException if the variable respresented by the
      */
-    public function visitVariableNode(VariableNode $node)
+    public function visitVariableNode(VariableNode $node): RationalNode
     {
         $name = $node->getName();
 
@@ -232,14 +230,13 @@ class RationalEvaluator implements Visitor
      * an elementary function recognized by StdMathLexer and StdMathParser.
      *
      *      FunctionNode is *not* recognized.
-     * @return float
      * @see \MathParser\Lexer\StdMathLexer StdMathLexer
      * @see \MathParser\StdMathParser StdMathParser
      *
      * @param  FunctionNode             $node AST to be evaluated
      * @throws UnknownFunctionException if the function respresented by the
      */
-    public function visitFunctionNode(FunctionNode $node)
+    public function visitFunctionNode(FunctionNode $node): RationalNode
     {
         $inner = $node->getOperand()->accept($this);
 
@@ -277,7 +274,8 @@ class RationalEvaluator implements Visitor
                     return new RationalNode(-1, 0);
                 }
 
-            // Powers
+                // Powers
+                // no break
             case 'sqrt':
                 return $this->rpow($inner, new RationalNode(1, 2));
 
@@ -306,14 +304,13 @@ class RationalEvaluator implements Visitor
      * Returns the value of a ConstantNode recognized by StdMathLexer and StdMathParser.
      *
      *      ConstantNode is *not* recognized.
-     * @return float
      * @see \MathParser\Lexer\StdMathLexer StdMathLexer
      * @see \MathParser\StdMathParser StdMathParser
      *
      * @param  ConstantNode             $node AST to be evaluated
      * @throws UnknownConstantException if the variable respresented by the
      */
-    public function visitConstantNode(ConstantNode $node)
+    public function visitConstantNode(ConstantNode $node): never
     {
         switch ($node->getName()) {
             case 'pi':
@@ -330,10 +327,10 @@ class RationalEvaluator implements Visitor
     /**
      * Private cache for prime sieve
      *
-     * @var array int $sieve
+     * @var array<int,int> $sieve
      *
      */
-    private static $sieve = [];
+    private static array $sieve = [];
 
     /**
      * Integer factorization
@@ -342,14 +339,15 @@ class RationalEvaluator implements Visitor
      * trial division and a cached sieve of computed primes
      *
      * @param type var Description
+     * @return array<int,int>
      */
-    public static function ifactor($n)
+    public static function ifactor(int $n): array
     {
 
         // max_n = 2^31-1 = 2147483647
         $d = 2;
         $factors = [];
-        $dmax = floor(sqrt($n));
+        $dmax = (int)floor(sqrt($n));
 
         self::$sieve = array_pad(self::$sieve, $dmax, 1);
 
@@ -374,7 +372,7 @@ class RationalEvaluator implements Visitor
                 }
                 do {
                     $d++;
-                } while ($d < $dmax && self::$sieve[$d] != 1);
+                } while ($d < $dmax && self::$sieve[$d] !== 1);
 
                 if ($d > $dmax) {
                     if (array_key_exists($n, $factors)) {
@@ -400,8 +398,9 @@ class RationalEvaluator implements Visitor
      * ]
      *
      * @param int $n input
+     * @return array{"square":float,"nonSquare":float}
      */
-    public static function powerFreeFactorization($n, $d)
+    public static function powerFreeFactorization(int $n, int $d): array
     {
         $factors = self::ifactor($n);
 
@@ -423,7 +422,7 @@ class RationalEvaluator implements Visitor
         return ['square' => $square, 'nonSquare' => $nonSquare];
     }
 
-    private function rpow($a, $b)
+    private function rpow(RationalNode $a, RationalNode $b): RationalNode
     {
         if ($b->getDenominator() == 1) {
             $n = $b->getNumerator();

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @package     Parsing
  * @author      Frank Wikström <frank@mossadal.se>
@@ -16,20 +18,19 @@ use MathParser\Interpreting\Visitors\Visitor;
  */
 class VariableNode extends Node
 {
-    /** string $name Name of represented variable, e.g. 'x' */
-    private $name;
+    /** Name of represented variable, e.g. 'x' */
+    private string $name;
 
     /** Constructor. Create a VariableNode with a given variable name. */
-    function __construct($name)
+    public function __construct(string $name)
     {
         $this->name = $name;
     }
 
     /**
      * Return the name of the variable
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -37,13 +38,13 @@ class VariableNode extends Node
     /**
      * Implementing the Visitable interface.
      */
-    public function accept(Visitor $visitor)
+    public function accept(Visitor $visitor): mixed
     {
         return $visitor->visitVariableNode($this);
     }
 
     /** Implementing the compareTo abstract method. */
-    public function compareTo($other)
+    public function compareTo(?Node $other): bool
     {
         if ($other === null) {
             return false;
@@ -54,5 +55,4 @@ class VariableNode extends Node
 
         return $this->getName() == $other->getName();
     }
-
 }

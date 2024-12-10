@@ -11,7 +11,7 @@ class ASCIIPrinterTest extends TestCase
     private $parser;
     private $printer;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->parser = new RationalMathParser();
         $this->printer = new ASCIIPrinter();
@@ -69,7 +69,6 @@ class ASCIIPrinterTest extends TestCase
         $this->assertResult('1-(-1)*x', '1-(-1)*x');
         $this->assertResult('x*(-1)+(-2)*(-x)', 'x*(-1)+(-2)*(-x)');
         $this->assertResult('x*(-1)-(-2)*(-x)', 'x*(-1)-(-2)*(-x)');
-
     }
 
     public function testCanPrintDivision()

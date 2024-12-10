@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @package     Parsing
  * @author      Frank Wikström <frank@mossadal.se>
@@ -7,45 +9,52 @@
  *
  */
 
-
 namespace MathParser\Parsing;
 
 /**
  * Utility class, implementing a simple FIFO stack
+ * @template TValue
  */
-class Stack {
-    /** mixed[] $data internal storage of data on the stack. */
-    protected $data = array();
+class Stack
+{
+    /**
+     * internal storage of data on the stack.
+     * @var list<TValue>
+     */
+    protected array $data = [];
 
     /**
      * Push an element onto the stack.
-     * @param mixed $element
+     * @param TValue $element
      */
-    public function push($element) {
+    public function push(mixed $element): void
+    {
         $this->data[] = $element;
     }
 
     /**
      * Return the top element (without popping it)
-     * @return mixed
+     * @return TValue
      */
-    public function peek() {
+    public function peek(): mixed
+    {
         return end($this->data);
     }
 
     /**
      * Return the top element and remove it from the stack.
-     * @return mixed
+     * @return TValue
      */
-    public function pop() {
+    public function pop(): mixed
+    {
         return array_pop($this->data);
     }
 
     /**
      * Return the current number of elements in the stack.
-     * @return int
      */
-    public function count() {
+    public function count(): int
+    {
         return count($this->data);
     }
 
@@ -54,14 +63,13 @@ class Stack {
      *
      * @return boolean
      **/
-    public function isEmpty()
+    public function isEmpty(): bool
     {
-        return $this->count() == 0;
+        return $this->count() === 0;
     }
 
-    public function __toString()
+    public function __toString(): string
     {
         return implode(' ; ', $this->data);
     }
-
 }

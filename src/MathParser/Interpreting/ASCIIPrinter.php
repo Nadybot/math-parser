@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @author      Frank Wikström <frank@mossadal.se>
  * @copyright   2016 Frank Wikström
@@ -44,29 +46,15 @@ use MathParser\Parsing\Nodes\VariableNode;
 class ASCIIPrinter implements Visitor
 {
     /**
-     * StdMathLexer $lexer
-     */
-    private $lexer;
-
-    /**
-     * Constructor. Create an ASCIIPrinter.
-     */
-    public function __construct()
-    {
-        $this->lexer = new StdMathLexer();
-    }
-
-    /**
      * Generate ASCII output code for an ExpressionNode
      *
      * Create a string giving ASCII output representing an ExpressionNode `(x op y)`
      * where `op` is one of `+`, `-`, `*`, `/` or `^`
      *
      *
-     * @return string
      * @param ExpressionNode $node AST to be typeset
      */
-    public function visitExpressionNode(ExpressionNode $node)
+    public function visitExpressionNode(ExpressionNode $node): string
     {
         $operator = $node->getOperator();
         $left = $node->getLeft();
@@ -95,6 +83,7 @@ class ASCIIPrinter implements Visitor
                     return "-$leftValue";
                 }
 
+                // no break
             case '*':
             case '/':
 
@@ -111,21 +100,21 @@ class ASCIIPrinter implements Visitor
         }
     }
 
-    public function visitNumberNode(NumberNode $node)
+    public function visitNumberNode(NumberNode $node): string
     {
         $val = $node->getValue();
 
         return "$val";
     }
 
-    public function visitIntegerNode(IntegerNode $node)
+    public function visitIntegerNode(IntegerNode $node): string
     {
         $val = $node->getValue();
 
         return "$val";
     }
 
-    public function visitRationalNode(RationalNode $node)
+    public function visitRationalNode(RationalNode $node): string
     {
         $p = $node->getNumerator();
         $q = $node->getDenominator();
@@ -138,12 +127,12 @@ class ASCIIPrinter implements Visitor
         return "$p/$q";
     }
 
-    public function visitVariableNode(VariableNode $node)
+    public function visitVariableNode(VariableNode $node): string
     {
         return (string) ($node->getName());
     }
 
-    private function visitFactorialNode(FunctionNode $node)
+    private function visitFactorialNode(FunctionNode $node): string
     {
         $functionName = $node->getName();
         $op = $node->getOperand();
@@ -163,7 +152,7 @@ class ASCIIPrinter implements Visitor
         return "$operand$functionName";
     }
 
-    public function visitFunctionNode(FunctionNode $node)
+    public function visitFunctionNode(FunctionNode $node): string
     {
         $functionName = $node->getName();
 
@@ -176,7 +165,7 @@ class ASCIIPrinter implements Visitor
         return "$functionName($operand)";
     }
 
-    public function visitConstantNode(ConstantNode $node)
+    public function visitConstantNode(ConstantNode $node): string
     {
         switch ($node->getName()) {
             case 'pi':
@@ -194,7 +183,7 @@ class ASCIIPrinter implements Visitor
         }
     }
 
-    public function parenthesize(Node $node, ExpressionNode $cutoff, $prepend = '', $conservative = false)
+    public function parenthesize(Node $node, ExpressionNode $cutoff, string $prepend='', bool $conservative=false): string
     {
         $text = $node->accept($this);
 

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @package     Exceptions
  * @author      Frank Wikström <frank@mossadal.se>

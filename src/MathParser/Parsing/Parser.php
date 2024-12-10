@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
 * @package     Parsing
 * @author      Frank Wikström <frank@mossadal.se>
@@ -13,12 +15,11 @@
 *
 * Parser related classes
 */
+
 namespace MathParser\Parsing;
 
 use MathParser\Lexing\Token;
 use MathParser\Lexing\TokenType;
-use MathParser\Lexing\TokenPrecedence;
-use MathParser\Lexing\TokenAssociativity;
 
 use MathParser\Parsing\Nodes\Node;
 use MathParser\Parsing\Nodes\ExpressionNode;
@@ -32,8 +33,6 @@ use MathParser\Parsing\Nodes\RationalNode;
 
 use MathParser\Exceptions\SyntaxErrorException;
 use MathParser\Exceptions\ParenthesisMismatchException;
-
-use MathParser\Interpreting\PrettyPrinter;
 
 /**
 * Mathematical expression parser, based on the shunting yard algorithm.
@@ -61,39 +60,39 @@ use MathParser\Interpreting\PrettyPrinter;
 class Parser
 {
     /**
-    * Token[] list of tokens to process
-    */
-    protected $tokens;
+     * List of tokens to process
+     * @var list<Token>
+     */
+    protected array $tokens;
+
     /**
-    * Stack stack of operators waiting to process
-    */
-    protected $operatorStack;
+     * Stack stack of operators waiting to process
+     * @var Stack<Node>
+     */
+    protected Stack $operatorStack;
     /**
     * Stack stack of operands waiting to process
+     * @var Stack<Node>
     */
-    protected $operandStack;
-    /**
-     * NodeFactory
-     */
-     protected $nodeFactory;
+    protected Stack $operandStack;
 
-    protected $rationalFactory = false;
-    protected $simplifyingParser = true;
+    protected bool $rationalFactory = false;
+    protected bool $simplifyingParser = true;
 
     /**
      * Constructor
      */
-    public function __construct()
-    {
-        $this->nodeFactory = new NodeFactory();
+    public function __construct(
+        protected NodeFactory $nodeFactory=new NodeFactory()
+    ) {
     }
 
-    public function setRationalFactory($flag)
+    public function setRationalFactory(bool $flag): void
     {
         $this->rationalFactory = $flag;
     }
 
-    public function setSimplifying($flag)
+    public function setSimplifying(bool $flag): void
     {
         $this->simplifyingParser = $flag;
     }
@@ -101,10 +100,10 @@ class Parser
     /**
     * Parse list of tokens
     *
-    * @param array $tokens Array (Token[]) of input tokens.
-    * @retval Node AST representing the parsed expression.
+    * @param Token[] $tokens Array (Token[]) of input tokens.
+    * @return Node AST representing the parsed expression.
     */
-    public function parse(array $tokens)
+    public function parse(array $tokens): Node
     {
         // Filter away any whitespace
         $tokens = $this->filterTokens($tokens);
@@ -123,12 +122,12 @@ class Parser
     /**
     * Implementation of the shunting yard parsing algorithm
     *
-    * @param array $tokens Token[] array of tokens to process
-    * @retval Node AST of the parsed expression
+    * @param list<Token> $tokens Array of tokens to process
+    * @return Node AST of the parsed expression
     * @throws SyntaxErrorException
     * @throws ParenthesisMismatchException
     */
-    private function shuntingYard(array $tokens)
+    private function shuntingYard(array $tokens): Node
     {
         // Clear the oepratorStack
         $this->operatorStack = new Stack();
@@ -140,14 +139,7 @@ class Parser
         $lastNode = null;
 
         // Loop over the tokens
-        for ($index = 0; $index < count($tokens); $index++)
-        {
-            $token = $tokens[$index];
-
-            // echo "current token $token\n";
-            // echo("operands:" . $this->operandStack . "\n");
-            // echo("operators: " . $this->operatorStack . "\n\n");
-
+        foreach ($tokens as $token) {
             if ($this->rationalFactory) {
                 $node = Node::rationalFactory($token);
             } else {
@@ -162,51 +154,54 @@ class Parser
             elseif ($node->isTerminal()) {
                 $this->operandStack->push($node);
 
-                // Push function applications or open parentheses `(` onto the operatorStack
+            // Push function applications or open parentheses `(` onto the operatorStack
             } elseif ($node instanceof FunctionNode) {
                 $this->operatorStack->push($node);
-
             } elseif ($node instanceof SubExpressionNode) {
                 $this->operatorStack->push($node);
 
-                // Handle the remaining operators.
+            // Handle the remaining operators.
             } elseif ($node instanceof PostfixOperatorNode) {
                 $op = $this->operandStack->pop();
-                if ($op == NULL) throw new SyntaxErrorException();
+                if ($op == null) {
+                    throw new SyntaxErrorException();
+                }
                 $this->operandStack->push(new FunctionNode($node->getOperator(), $op));
-
             } elseif ($node instanceof ExpressionNode) {
 
                 // Check for unary minus and unary plus.
                 $unary = $this->isUnary($node, $lastNode);
 
                 if ($unary) {
-                    switch($token->getType()) {
+                    switch ($token->getType()) {
                         // Unary +, just ignore it
                         case TokenType::AdditionOperator:
-                        $node = null;
-                        break;
-                        // Unary -, replace the token.
+                            $node = null;
+                            break;
+                            // Unary -, replace the token.
                         case TokenType::SubtractionOperator:
-                        $node->setOperator('~');
-                        break;
+                            $node->setOperator('~');
+                            break;
                     }
                 } else {
                     // Pop operators with higher priority
 
                     while ($node->lowerPrecedenceThan($this->operatorStack->peek())) {
-
                         $popped = $this->operatorStack->pop();
                         $popped = $this->handleExpression($popped);
                         $this->operandStack->push($popped);
                     }
                 }
 
-                if ($node) $this->operatorStack->push($node);
+                if ($node) {
+                    $this->operatorStack->push($node);
+                }
             }
 
             // Remember the current token (if it hasn't been nulled, for example being a unary +)
-            if ($node) $lastNode = $node;
+            if ($node) {
+                $lastNode = $node;
+            }
         }
 
 
@@ -230,19 +225,22 @@ class Parser
     /**
     * Populate node with operands.
     *
-    * @param Node $node
-    * @retval Node
     * @throws SyntaxErrorException
     */
-    protected function handleExpression($node)
+    protected function handleExpression(Node $node): Node
     {
-        if ($node instanceof FunctionNode) throw new ParenthesisMismatchException($node->getOperator());
-        if ($node instanceof SubExpressionNode) throw new ParenthesisMismatchException($node->getOperator());
+        if ($node instanceof FunctionNode) {
+            throw new ParenthesisMismatchException($node->getOperator());
+        }
+        if ($node instanceof SubExpressionNode) {
+            throw new ParenthesisMismatchException($node->getOperator());
+        }
 
-        if (!$this->simplifyingParser) return $this->naiveHandleExpression($node);
+        if (!$this->simplifyingParser) {
+            return $this->naiveHandleExpression($node);
+        }
 
-        if ($node->getOperator() == '~') {
-
+        if ($node->getOperator() === '~') {
             $left = $this->operandStack->pop();
             if ($left === null) {
                 throw new SyntaxErrorException();
@@ -260,6 +258,10 @@ class Parser
                 return new RationalNode(-$left->getNumerator(), $left->getDenominator());
             }
 
+            if (!($node instanceof ExpressionNode)) {
+                throw new SyntaxErrorException();
+            }
+
             $node->setOperator('-');
             $node->setLeft($left);
 
@@ -272,6 +274,9 @@ class Parser
             throw new SyntaxErrorException();
         }
 
+        if (!($node instanceof ExpressionNode)) {
+            throw new SyntaxErrorException();
+        }
         $node->setLeft($left);
         $node->setRight($right);
 
@@ -281,14 +286,11 @@ class Parser
     /**
     * Populate node with operands, without any simplification.
     *
-    * @param Node $node
-    * @retval Node
     * @throws SyntaxErrorException
     */
-    protected function naiveHandleExpression($node)
+    protected function naiveHandleExpression(ExpressionNode $node): ExpressionNode
     {
         if ($node->getOperator() == '~') {
-
             $left = $this->operandStack->pop();
             if ($left === null) {
                 throw new SyntaxErrorException();
@@ -315,10 +317,10 @@ class Parser
     /**
     * Remove Whitespace from the token list.
     *
-    * @param array $tokens Input list of tokens
-    * @retval Token[]
+    * @param list<Token> $tokens Input list of tokens
+    * @return list<Token>
     */
-    protected function filterTokens(array $tokens)
+    protected function filterTokens(array $tokens): array
     {
         $filteredTokens = array_filter($tokens, function (Token $t) {
             return $t->getType() !== TokenType::Whitespace;
@@ -331,10 +333,10 @@ class Parser
     /**
     * Insert multiplication tokens where needed (taking care of implicit mulitplication).
     *
-    * @param array $tokens Input list of tokens (Token[])
-    * @retval Token[]
+    * @param Token[] $tokens Input list of tokens
+    * @return list<Token>
     */
-    protected function parseImplicitMultiplication(array $tokens)
+    protected function parseImplicitMultiplication(array $tokens): array
     {
         $result = [];
         $lastToken = null;
@@ -368,9 +370,8 @@ class Parser
     * $node = $parser->parse($tokens); // Throws a SyntaxErrorException
     * ~~~
     * @property allowImplicitMultiplication
-    * @retval boolean
     */
-    protected static function allowImplicitMultiplication()
+    protected static function allowImplicitMultiplication(): bool
     {
         return true;
     }
@@ -385,20 +386,27 @@ class Parser
      * current node is in fact a unary '+' or '-' and we return true,
      * otherwise we return false.
      *
-     * @param Node $node Current node
-     * @param Node|null $lastNode Previous node handled by the Parser
-     * @retval boolean
+     * @param ExpressionNode $node Current node
+     * @param ?Node $lastNode Previous node handled by the Parser
      */
-    protected function isUnary($node, $lastNode)
+    protected function isUnary(ExpressionNode $node, ?Node $lastNode): bool
     {
-        if (!($node->canBeUnary())) return false;
+        if (!($node->canBeUnary())) {
+            return false;
+        }
 
         // Unary if it is the first token
-        if ($this->operatorStack->isEmpty() && $this->operandStack->isEmpty()) return true;
+        if ($this->operatorStack->isEmpty() && $this->operandStack->isEmpty()) {
+            return true;
+        }
         // or if the previous token was '('
-        if ($lastNode instanceof SubExpressionNode) return true;
+        if ($lastNode instanceof SubExpressionNode) {
+            return true;
+        }
         // or last node was already a unary minus
-        if ($lastNode instanceof ExpressionNode && $lastNode->getOperator() == '~') return true;
+        if ($lastNode instanceof ExpressionNode && $lastNode->getOperator() === '~') {
+            return true;
+        }
 
         return false;
     }
@@ -408,7 +416,7 @@ class Parser
      *
      * @throws ParenthesisMismatchException
      */
-    protected function handleSubExpression()
+    protected function handleSubExpression(): void
     {
         // Flag, checking for mismatching parentheses
         $clean = false;
@@ -426,7 +434,6 @@ class Parser
 
             $node = $this->handleExpression($popped);
             $this->operandStack->push($node);
-
         }
 
         // Throw an error if the parenthesis couldn't be matched
@@ -442,9 +449,9 @@ class Parser
         if ($previous instanceof FunctionNode) {
             $node = $this->operatorStack->pop();
             $operand = $this->operandStack->pop();
+            assert($node instanceof FunctionNode);
             $node->setOperand($operand);
             $this->operandStack->push($node);
         }
     }
-
 }

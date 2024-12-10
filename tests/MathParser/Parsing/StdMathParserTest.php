@@ -17,7 +17,7 @@ use PHPUnit\Framework\TestCase;
 
 class ParserWithoutImplicitMultiplication extends Parser
 {
-    protected static function allowImplicitMultiplication()
+    protected static function allowImplicitMultiplication(): bool
     {
         return false;
     }
@@ -27,7 +27,7 @@ class StdMathParserTest extends TestCase
 {
     private $parser;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->parser = new StdMathParser();
     }
@@ -84,7 +84,6 @@ class StdMathParserTest extends TestCase
         $this->assertTokenEquals("x", TokenType::Identifier, $tokens[0]);
         $this->assertTokenEquals("+", TokenType::AdditionOperator, $tokens[1]);
         $this->assertTokenEquals("y", TokenType::Identifier, $tokens[2]);
-
     }
 
     public function testCanGetTree()
@@ -103,7 +102,6 @@ class StdMathParserTest extends TestCase
         $node = $this->parser->parse("3.5");
         $shouldBe = new NumberNode(3.5);
         $this->assertNodesEqual($node, $shouldBe);
-
     }
 
     public function testCanParseSingleVariable()
@@ -208,7 +206,6 @@ class StdMathParserTest extends TestCase
             new ExpressionNode(new VariableNode('y'), '^', new VariableNode('z'))
         );
         $this->assertNodesEqual($node, $shouldBe);
-
     }
 
     public function testCanParseThreeTerms()
@@ -283,7 +280,6 @@ class StdMathParserTest extends TestCase
             new VariableNode('z')
         );
         $this->assertNodesEqual($node, $shouldBe);
-
     }
 
     public function testCanParseWithCorrectPrecedence()
@@ -358,7 +354,6 @@ class StdMathParserTest extends TestCase
         $node = $this->parser->parse("(x+1)(x-1)");
         $shouldBe = $this->parser->parse("(x+1)*(x-1)");
         $this->assertNodesEqual($node, $shouldBe);
-
     }
 
     public function testCanParseUnaryOperators()
@@ -394,7 +389,6 @@ class StdMathParserTest extends TestCase
             new VariableNode('y')
         );
         $this->assertNodesEqual($node, $shouldBe);
-
     }
 
     public function testSyntaxErrorException()
@@ -472,7 +466,6 @@ class StdMathParserTest extends TestCase
         $node = $this->parser->parse("-3");
         $shouldBe = new ExpressionNode(new NumberNode(3), '-', null);
         $this->assertNodesEqual($node, $shouldBe);
-
     }
 
     public function canParseFactorial()
@@ -481,14 +474,16 @@ class StdMathParserTest extends TestCase
         $shouldBe = new ExpressionNode(
             new FunctionNode('!', new NumberNode(3)),
             '*',
-            new FunctionNode('!', new NumberNode(4)));
+            new FunctionNode('!', new NumberNode(4))
+        );
         $this->assertNodesEqual($node, $shouldBe);
 
         $node = $this->parser->parse("-3!");
         $shouldBe = new ExpressionNode(
             new FunctionNode('!', new NumberNode(3)),
             '-',
-            null);
+            null
+        );
         $this->assertNodesEqual($node, $shouldBe);
     }
 
@@ -503,5 +498,4 @@ class StdMathParserTest extends TestCase
         $this->expectException(SyntaxErrorException::class);
         $this->parser->parse('1+!1');
     }
-
 }

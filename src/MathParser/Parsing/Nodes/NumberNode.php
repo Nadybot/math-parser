@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @package     Parsing
  * @author      Frank Wikström <frank@mossadal.se>
@@ -14,22 +16,21 @@ use MathParser\Interpreting\Visitors\Visitor;
 /**
  * AST node representing a number (int or float)
  */
-class NumberNode extends Node
+class NumberNode extends NumericNode
 {
-    /** int|float $value The value of the represented number. */
-    private $value;
+    /** The value of the represented number. */
+    private int|float $value;
 
     /** Constructor. Create a NumberNode with given value. */
-    function __construct($value)
+    public function __construct(int|float $value)
     {
         $this->value = $value;
     }
 
     /**
      * Returns the value
-     * @return int|float
      */
-    public function getValue()
+    public function getValue(): int|float
     {
         return $this->value;
     }
@@ -37,13 +38,13 @@ class NumberNode extends Node
     /**
      * Implementing the Visitable interface.
      */
-    public function accept(Visitor $visitor)
+    public function accept(Visitor $visitor): mixed
     {
         return $visitor->visitNumberNode($this);
     }
 
     /** Implementing the compareTo abstract method. */
-    public function compareTo($other)
+    public function compareTo(?Node $other): bool
     {
         if ($other === null) {
             return false;
@@ -54,5 +55,4 @@ class NumberNode extends Node
 
         return $this->getValue() == $other->getValue();
     }
-
 }

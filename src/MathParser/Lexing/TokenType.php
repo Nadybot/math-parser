@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @package     Lexical analysis
  * @subpackage  Token handling
@@ -37,47 +39,47 @@ namespace MathParser\Lexing;
 final class TokenType
 {
     /** Token representing a positive integer */
-    const PosInt = 1;
+    public const PosInt = 1;
     /** Token representing a (not necessarily positive) integer */
-    const Integer = 2;
+    public const Integer = 2;
     /** Token representing a floating point number */
-    const RealNumber = 3;
+    public const RealNumber = 3;
 
     /** Token representing an identifier, i.e. a variable name. */
-    const Identifier = 20;
+    public const Identifier = 20;
     /** Token representing an opening parenthesis, i.e. '(' */
-    const OpenParenthesis = 31;
+    public const OpenParenthesis = 31;
     /** Token representing a closing parenthesis, i.e. ')' */
-    const CloseParenthesis = 32;
+    public const CloseParenthesis = 32;
 
     /** Token representing a unary minus. Not used. This is the responsibility of the Parser */
-    const UnaryMinus = 99;
+    public const UnaryMinus = 99;
     /** Token representing '+' */
-    const AdditionOperator = 100;
+    public const AdditionOperator = 100;
     /** Token representing '-' */
-    const SubtractionOperator = 101;
+    public const SubtractionOperator = 101;
     /** Token representing '*' */
-    const MultiplicationOperator = 102;
+    public const MultiplicationOperator = 102;
     /** Token representing '/' */
-    const DivisionOperator = 103;
+    public const DivisionOperator = 103;
     /** Token representing '^' */
-    const ExponentiationOperator = 104;
+    public const ExponentiationOperator = 104;
     /** Token representing postfix factorial operator '!' */
-    const FactorialOperator = 105;
+    public const FactorialOperator = 105;
     /** Token representing postfix subfactorial operator '!!' */
-    const SemiFactorialOperator = 105;
+    public const SemiFactorialOperator = 105;
 
     /** Token represented a function name, e.g. 'sin' */
-    const FunctionName = 200;
+    public const FunctionName = 200;
 
     /** Token represented a known constant, e.g. 'pi' */
-    const Constant = 300;
+    public const Constant = 300;
 
     /** Token representing a terminator, e.g. ';'. Currently not used. */
-    const Terminator = 998;
+    public const Terminator = 998;
     /** Token representing white space, e.g. spaces and tabs. */
-    const Whitespace = 999;
+    public const Whitespace = 999;
 
     /** Token representing a senitinel, for internal used in the Parser. Not used. */
-    const Sentinel = 1000;
+    public const Sentinel = 1000;
 }

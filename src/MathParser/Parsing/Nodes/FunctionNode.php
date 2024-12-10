@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @package     Parsing
  * @author      Frank Wikström <frank@mossadal.se>
@@ -17,46 +19,45 @@ use MathParser\Interpreting\Visitors\Visitor;
 class FunctionNode extends Node
 {
     /** string $name Function name, e.g. 'sin' */
-    private $name;
+    private string $name;
     /** Node $operand AST of function operand */
-    private $operand;
+    private ?Node $operand=null;
 
     /** Constructor, create a FunctionNode with given name and operand */
-    function __construct($name, $operand)
+    public function __construct(string $name, null|int|Node $operand)
     {
         $this->name = $name;
-        if (is_int($operand)) $operand = new NumberNode($operand);
+        if (is_int($operand)) {
+            $operand = new NumberNode($operand);
+        }
         $this->operand = $operand;
     }
 
     /**
      * Return the name of the function
-     * @return string
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
     /**
      * Return the operand
-     * @return Node
      */
-    public function getOperand()
+    public function getOperand(): ?Node
     {
         return $this->operand;
     }
 
     /**
      * Set the operand
-     * @return void
      */
-    public function setOperand($operand)
+    public function setOperand(Node $operand): Node
     {
         return $this->operand = $operand;
     }
 
-    public function getOperator()
+    public function getOperator(): string
     {
         return $this->name;
     }
@@ -64,13 +65,13 @@ class FunctionNode extends Node
     /**
      * Implementing the Visitable interface.
      */
-    public function accept(Visitor $visitor)
+    public function accept(Visitor $visitor): mixed
     {
         return $visitor->visitFunctionNode($this);
     }
 
     /** Implementing the compareTo abstract method. */
-    public function compareTo($other)
+    public function compareTo(?Node $other): bool
     {
         if ($other === null) {
             return false;
@@ -84,5 +85,4 @@ class FunctionNode extends Node
 
         return $this->getName() == $other->getName() && $thisOperand->compareTo($otherOperand);
     }
-
 }

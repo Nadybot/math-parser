@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @package     Parsing
  * @author      Frank Wikström <frank@mossadal.se>
@@ -24,21 +26,21 @@ class ExpressionNode extends Node
     /**
      * Node $left Left operand
      */
-    private $left;
+    private ?Node $left=null;
     /** string $operator Operator, e.g. '+', '-', '*', '/' or '^' **/
-    private $operator;
+    private ?string $operator=null;
     /** Node $right Right operand **/
-    private $right;
+    private ?Node $right=null;
 
     /** int $precedence Precedence. Operators with higher prcedence bind harder **/
-    private $precedence;
+    private int $precedence;
     /** LEFT_ASSOC | RIGHT_ASSOC $associativity Associativity of operator. **/
-    private $associativity;
+    private int $associativity;
 
     /** integer constant representing left associatve operators */
-    const LEFT_ASSOC = 1;
+    public const LEFT_ASSOC = 1;
     /** integer constant representing left associatve operators */
-    const RIGHT_ASSOC = 2;
+    public const RIGHT_ASSOC = 2;
 
     /**
      * Constructor
@@ -55,17 +57,20 @@ class ExpressionNode extends Node
      * ~~~
      *
      * @param Node|null|int|float $left First operand
-     * @param string $operator Name of operator
+     * @param ?string $operator Name of operator
      * @param Node|null|int|float $right Second operand
      *
      */
-    function __construct($left, $operator = null, $right = null)
-    {
+    public function __construct(
+        null|Node|int|float $left,
+        ?string $operator=null,
+        null|Node|int|float $right=null
+    ) {
         $this->left = $this->sanitize($left);
         $this->operator = $operator;
         $this->right = $this->sanitize($right);
 
-        switch($operator) {
+        switch ($operator) {
             case '+':
                 $this->precedence = 10;
                 $this->associativity = self::LEFT_ASSOC;
@@ -97,7 +102,7 @@ class ExpressionNode extends Node
                 break;
 
             default:
-                throw new UnknownOperatorException($operator);
+                throw new UnknownOperatorException((string)$operator);
         }
     }
 
@@ -174,7 +179,7 @@ class ExpressionNode extends Node
     /**
      * Implementing the Visitable interface.
      */
-    public function accept(Visitor $visitor)
+    public function accept(Visitor $visitor): mixed
     {
         return $visitor->visitExpressionNode($this);
     }
@@ -202,29 +207,39 @@ class ExpressionNode extends Node
      */
     public function lowerPrecedenceThan($other)
     {
-        if (!($other instanceof ExpressionNode)) return false;
+        if (!($other instanceof ExpressionNode)) {
+            return false;
+        }
 
-        if ($this->getPrecedence() < $other->getPrecedence()) return true;
-        if ($this->getPrecedence() > $other->getPrecedence()) return false;
+        if ($this->getPrecedence() < $other->getPrecedence()) {
+            return true;
+        }
+        if ($this->getPrecedence() > $other->getPrecedence()) {
+            return false;
+        }
 
-        if ($this->associativity == self::LEFT_ASSOC) return true;
+        if ($this->associativity == self::LEFT_ASSOC) {
+            return true;
+        }
 
         return false;
-
     }
 
     public function strictlyLowerPrecedenceThan($other)
     {
-        if (!($other instanceof ExpressionNode)) return false;
+        if (!($other instanceof ExpressionNode)) {
+            return false;
+        }
 
-        if ($this->getPrecedence() < $other->getPrecedence()) return true;
+        if ($this->getPrecedence() < $other->getPrecedence()) {
+            return true;
+        }
 
         return false;
-
     }
 
     /** Implementing the compareTo abstract method. */
-    public function compareTo($other)
+    public function compareTo(?Node $other): bool
     {
         if ($other === null) {
             return false;
@@ -233,7 +248,9 @@ class ExpressionNode extends Node
             return false;
         }
 
-        if ($this->getOperator() != $other->getOperator()) return false;
+        if ($this->getOperator() != $other->getOperator()) {
+            return false;
+        }
 
         $thisLeft = $this->getLeft();
         $otherLeft = $other->getLeft();
@@ -250,6 +267,4 @@ class ExpressionNode extends Node
 
         return $thisLeft->compareTo($otherLeft) && $thisRight->compareTo($otherRight);
     }
-
-
 }

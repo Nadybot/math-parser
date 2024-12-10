@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @package     Exceptions
  * @author      Frank Wikström <frank@mossadal.se>
@@ -7,16 +9,16 @@
  *
  */
 
- namespace MathParser\Exceptions;
+namespace MathParser\Exceptions;
 
- /**
-  * Exception thrown when parsing expressions having non-matching left and
-  * right parentheses.
-  */
+/**
+ * Exception thrown when parsing expressions having non-matching left and
+ * right parentheses.
+ */
 class ParenthesisMismatchException extends MathParserException
 {
     /** Constructor. Create a ParenthesisMismatchException */
-    public function __construct($data = null)
+    public function __construct(string $data='')
     {
         parent::__construct("Unable to match delimiters.");
 
@@ -25,10 +27,8 @@ class ParenthesisMismatchException extends MathParserException
 
     /**
      * Get the incorrect data that was encountered.
-     *
-     * @return string
      */
-    public function getData()
+    public function getData(): string
     {
         return $this->data;
     }

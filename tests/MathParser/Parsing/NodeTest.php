@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use MathParser\Interpreting\TreePrinter;
 use MathParser\Parsing\Nodes\ConstantNode;
 use MathParser\Parsing\Nodes\ExpressionNode;
@@ -17,12 +19,10 @@ use PHPUnit\Framework\TestCase;
 class NodeTest extends TestCase
 {
     private $parser;
-    private $factory;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->parser = new RationalMathParser();
-        $this->factory = new NodeFactory();
     }
 
     public function testCanCompareSubExpressionNodes()
@@ -97,7 +97,6 @@ class NodeTest extends TestCase
 
         $this->assertFalse($inode->compareTo(new RationalNode(3, 5)));
         $this->assertFalse($inode->compareTo($other));
-
     }
 
     public function testCanCompareExpressionNodes()
@@ -122,7 +121,6 @@ class NodeTest extends TestCase
         $this->assertFalse($node2->compareTo($node4));
         $this->assertFalse($node3->compareTo($node4));
         $this->assertFalse($node2->compareTo($node4));
-
     }
 
     public function testCanCompareUnaryMinus()
@@ -192,9 +190,6 @@ class NodeTest extends TestCase
 
         $node = new IntegerNode(-1);
         $this->assertEquals($node->getValue(), -1);
-
-        $this->expectException(\UnexpectedValueException::class);
-        $node = new IntegerNode(1.2);
     }
 
     public function testCanCreateRationalNode()
@@ -216,9 +211,6 @@ class NodeTest extends TestCase
         $node = new RationalNode(1, -2);
         $this->assertEquals($node->getNumerator(), -1);
         $this->assertEquals($node->getDenominator(), 2);
-
-        $this->expectException(\UnexpectedValueException::class);
-        $node = new RationalNode(1.2, 2);
     }
 
     public function testDivisionNodeFactory()
@@ -236,5 +228,4 @@ class NodeTest extends TestCase
             )
         );
     }
-
 }

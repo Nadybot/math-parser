@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
 * @package     Parsing
 * @author      Frank Wikström <frank@mossadal.se>
@@ -20,6 +22,7 @@ use MathParser\Parsing\Nodes\Traits\Sanitize;
 use MathParser\Parsing\Nodes\Traits\Numeric;
 
 use MathParser\Exceptions\DivisionByZeroException;
+use MathParser\Parsing\Nodes\NumericNode;
 
 /**
 * Factory for creating an ExpressionNode representing '^'.
@@ -48,84 +51,80 @@ class ExponentiationNodeFactory implements ExpressionNodeFactory
     *
     * @param Node|int $leftOperand Minuend
     * @param Node|int $rightOperand Subtrahend
-    * @retval Node
     */
-    public function makeNode($leftOperand, $rightOperand)
+    public function makeNode(int|Node $leftOperand, int|Node $rightOperand): Node
     {
         $leftOperand = $this->sanitize($leftOperand);
         $rightOperand = $this->sanitize($rightOperand);
 
         // Simplification if the exponent is a number.
-        if ($this->isNumeric($rightOperand)) {
+        if ($rightOperand instanceof NumericNode) {
             $node = $this->numericExponent($leftOperand, $rightOperand);
-            if ($node) return $node;
+            if ($node) {
+                return $node;
+            }
         }
 
         $node = $this->doubleExponentiation($leftOperand, $rightOperand);
-        if ($node) return $node;
+        if ($node) {
+            return $node;
+        }
 
         return new ExpressionNode($leftOperand, '^', $rightOperand);
     }
 
-    /** Simplify an expression x^y, when y is numeric.
-    *
-    * @param Node $leftOperand
-    * @param Node $rightOperand
-    * @retval Node|null
-    */
-    private function numericExponent($leftOperand, $rightOperand)
+    /** Simplify an expression x^y, when y is numeric. */
+    private function numericExponent(Node $leftOperand, NumericNode $rightOperand): ?Node
     {
         // 0^0 throws an exception
-        if ($this->isNumeric($leftOperand) && $this->isNumeric($rightOperand)) {
-            if ($leftOperand->getValue() == 0 && $rightOperand->getValue() == 0)
-            throw new DivisionByZeroException();
+        if (($leftOperand instanceof NumericNode) && $this->isNumeric($rightOperand)) {
+            if ($leftOperand->getValue() == 0 && $rightOperand->getValue() == 0) {
+                throw new DivisionByZeroException();
+            }
         }
 
         // x^0 = 1
-        if ($rightOperand->getValue() == 0) return new IntegerNode(1);
+        if ($rightOperand->getValue() == 0) {
+            return new IntegerNode(1);
+        }
         // x^1 = x
-        if ($rightOperand->getValue() == 1) return $leftOperand;
+        if ($rightOperand->getValue() == 1) {
+            return $leftOperand;
+        }
 
-        if (!$this->isNumeric($leftOperand) || !$this->isNumeric($rightOperand)) {
+        if (!($leftOperand instanceof NumericNode)) {
             return null;
         }
         $type = $this->resultingType($leftOperand, $rightOperand);
 
         // Compute x^y if both are numbers.
-        switch($type) {
+        switch ($type) {
             case Node::NumericFloat:
-            return new NumberNode(pow($leftOperand->getValue(), $rightOperand->getValue()));
+                return new NumberNode(pow($leftOperand->getValue(), $rightOperand->getValue()));
 
             case Node::NumericInteger:
-            if ($rightOperand->getValue() > 0)
-            {
-                return new IntegerNode(pow($leftOperand->getValue(), $rightOperand->getValue()));
-            }
+                if ($rightOperand->getValue() > 0) {
+                    return new IntegerNode(pow($leftOperand->getValue(), $rightOperand->getValue()));
+                }
         }
 
         // No simplification found
         return null;
     }
 
-    /** Simplify (x^a)^b when a and b are both numeric.
-    * @param Node $leftOperand
-    * @param Node $rightOperand
-    * @retval Node|null
-    */
-    private function doubleExponentiation($leftOperand, $rightOperand)
+    /** Simplify (x^a)^b when a and b are both numeric. */
+    private function doubleExponentiation(Node $leftOperand, Node $rightOperand): ?Node
     {
         // (x^a)^b -> x^(ab) for a, b numbers
         if ($leftOperand instanceof ExpressionNode && $leftOperand->getOperator() == '^') {
-
             $factory = new MultiplicationNodeFactory();
             $power = $factory->makeNode($leftOperand->getRight(), $rightOperand);
 
             $base = $leftOperand->getLeft();
-            return self::makeNode($base,  $power);
+            return self::makeNode($base, $power);
         }
 
         // No simplification found
         return null;
     }
-
 }

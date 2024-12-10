@@ -9,3 +9,5 @@ doc
 doc/html
 .tags*
 composer.lock
+.phpunit.cache
+.phpunit.result.cache

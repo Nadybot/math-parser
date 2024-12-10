@@ -13,7 +13,7 @@ class LaTeXPrinterTest extends TestCase
     private $parser;
     private $printer;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->parser = new RationalMathParser();
         $this->printer = new LaTeXPrinter();
@@ -59,7 +59,6 @@ class LaTeXPrinterTest extends TestCase
         $this->assertResult('x+(-y)', 'x+(-y)');
         $this->assertResult('x+y+z', 'x+y+z');
         $this->assertResult('1+2x+3x^2', '1+2x+3x^2');
-
     }
 
     public function testCanPrintProducts()
@@ -72,7 +71,6 @@ class LaTeXPrinterTest extends TestCase
 
     public function testCanPrintExponentiation()
     {
-
         $this->assertResult('x^y^z', 'x^{y^z}');
         $this->assertResult('(x^y)^z', 'x^{yz}');
 
@@ -80,7 +78,6 @@ class LaTeXPrinterTest extends TestCase
         $this->assertResult('x^y^z', 'x^{y^z}');
         $this->assertResult('(x^y)^z', '{x^y}^z');
         $this->parser->setSimplifying(true);
-
     }
 
     public function testCanAddBraces()

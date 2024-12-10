@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @package     Exceptions
  * @author      Frank Wikström <frank@mossadal.se>
@@ -12,6 +14,7 @@
   *
   * Exceptions thrown by the MathParser library.
   */
+
 namespace MathParser\Exceptions;
 
 /**
@@ -19,17 +22,14 @@ namespace MathParser\Exceptions;
  */
 abstract class MathParserException extends \Exception
 {
-    /** @var string Additional information about the exception. */
-    protected $data;
+    /** Additional information about the exception. */
+    protected string $data;
 
     /**
      * Get additional information about the exception.
-     *
-     * @return string
      */
-    public function getData()
+    public function getData(): string
     {
         return $this->data;
     }
-
 }

@@ -21,7 +21,7 @@ class RationalEvaluatorTest extends TestCase
     private $evaluator;
     private $variables;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->parser = new RationalMathParser();
 
@@ -220,7 +220,6 @@ class RationalEvaluatorTest extends TestCase
     {
         $this->expectException(\UnexpectedValueException::class);
         $this->assertResult('sinh(x)', 0);
-
     }
 
     public function testCannotEvalauateUnknownFunction()
@@ -229,7 +228,6 @@ class RationalEvaluatorTest extends TestCase
 
         $this->expectException(UnknownFunctionException::class);
         $value = $this->evaluate($f);
-
     }
 
     public function testCannotEvaluateUnknownOperator()
@@ -241,7 +239,6 @@ class RationalEvaluatorTest extends TestCase
         $this->expectException(UnknownOperatorException::class);
 
         $this->evaluate($node);
-
     }
 
     public function testUnknownException()

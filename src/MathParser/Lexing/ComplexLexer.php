@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @package     Lexical analysis
  * @author      Frank Wikström <frank@mossadal.se>
@@ -115,6 +117,5 @@ class ComplexLexer extends Lexer
 
         $this->add(new TokenDefinition('/\n/', TokenType::Terminator));
         $this->add(new TokenDefinition('/\s+/', TokenType::Whitespace));
-
     }
 }

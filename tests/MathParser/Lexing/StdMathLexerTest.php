@@ -10,7 +10,7 @@ class StdMathLexerTest extends TestCase
 {
     private $lexer;
 
-    public function setUp()
+    public function setUp(): void
     {
         $lexer = new StdMathLexer();
         $this->lexer = $lexer;
@@ -47,7 +47,6 @@ class StdMathLexerTest extends TestCase
         $this->assertCount(2, $tokens);
         $this->assertTokenEquals('-', TokenType::SubtractionOperator, $tokens[0]);
         $this->assertTokenEquals('2.3e1', TokenType::RealNumber, $tokens[1]);
-
     }
 
     public function testCanTokenizeOperator()
@@ -116,7 +115,6 @@ class StdMathLexerTest extends TestCase
         $this->assertTokenEquals('a', TokenType::Identifier, $tokens[0]);
         $this->assertTokenEquals(' ', TokenType::Whitespace, $tokens[1]);
         $this->assertTokenEquals('sin', TokenType::FunctionName, $tokens[2]);
-
     }
 
     public function testParenthesisTokens()
@@ -135,7 +133,6 @@ class StdMathLexerTest extends TestCase
         $this->assertTokenEquals('+', TokenType::AdditionOperator, $tokens[2]);
         $this->assertTokenEquals('1', TokenType::PosInt, $tokens[3]);
         $this->assertTokenEquals(')', TokenType::CloseParenthesis, $tokens[4]);
-
     }
 
     public function testWhitepsace()
@@ -149,7 +146,6 @@ class StdMathLexerTest extends TestCase
         $this->assertTokenEquals("+", TokenType::AdditionOperator, $tokens[3]);
         $this->assertTokenEquals("\n", TokenType::Terminator, $tokens[4]);
         $this->assertTokenEquals(' ', TokenType::Whitespace, $tokens[5]);
-
     }
 
     public function testArcsin()
@@ -190,5 +186,4 @@ class StdMathLexerTest extends TestCase
         $tokens = $this->lexer->tokenize("arctan");
         $this->assertTokenEquals('arctan', TokenType::FunctionName, $tokens[0]);
     }
-
 }

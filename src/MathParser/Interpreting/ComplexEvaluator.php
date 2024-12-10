@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @author      Frank Wikström <frank@mossadal.se>
  * @copyright   2016 Frank Wikström
@@ -49,18 +51,19 @@ use MathParser\Parsing\Nodes\VariableNode;
 class ComplexEvaluator implements Visitor
 {
     /**
-     * mixed[] $variables Key/value pair holding current values
-     *      of the variables used for evaluating.
+     * Variables Key/value pair holding current values
+     * of the variables used for evaluating.
      *
+     * @var array<string,Complex>
      */
-    private $variables;
+    private array $variables;
 
     /**
      * Constructor. Create an Evaluator with given variable values.
      *
-     * @param mixed $variables key-value array of variables with corresponding values.
+     * @param array<string,Complex|Rational|int|float|string> $variables key-value array of variables with corresponding values.
      */
-    public function __construct($variables = null)
+    public function __construct(array $variables=[])
     {
         $this->setVariables($variables);
     }
@@ -68,10 +71,9 @@ class ComplexEvaluator implements Visitor
     /**
      * Update the variables used for evaluating
      *
-     * @return void
-     * @param array $variables Key/value pair holding current variable values
+     * @param array<string,Complex|Rational|int|float|string> $variables Key/value pair holding current variable values
      */
-    public function setVariables($variables)
+    public function setVariables(array $variables): void
     {
         $this->variables = [];
         foreach ($variables as $var => $value) {
@@ -86,11 +88,10 @@ class ComplexEvaluator implements Visitor
      * where `op` is one of `+`, `-`, `*`, `/` or `^`
      *
      *      `+`, `-`, `*`, `/` or `^`
-     * @return float
      * @param  ExpressionNode           $node AST to be evaluated
      * @throws UnknownOperatorException if the operator is something other than
      */
-    public function visitExpressionNode(ExpressionNode $node)
+    public function visitExpressionNode(ExpressionNode $node): Complex
     {
         $operator = $node->getOperator();
 
@@ -129,20 +130,19 @@ class ComplexEvaluator implements Visitor
      *
      * Retuns the value of an NumberNode
      *
-     * @return float
      * @param NumberNode $node AST to be evaluated
      */
-    public function visitNumberNode(NumberNode $node)
+    public function visitNumberNode(NumberNode $node): Complex
     {
         return Complex::create($node->getValue(), 0);
     }
 
-    public function visitIntegerNode(IntegerNode $node)
+    public function visitIntegerNode(IntegerNode $node): Complex
     {
         return Complex::create($node->getValue(), 0);
     }
 
-    public function visitRationalNode(RationalNode $node)
+    public function visitRationalNode(RationalNode $node): Complex
     {
         return Complex::create("$node", 0);
     }
@@ -160,7 +160,7 @@ class ComplexEvaluator implements Visitor
      * @param  VariableNode             $node AST to be evaluated
      * @throws UnknownVariableException if the variable respresented by the
      */
-    public function visitVariableNode(VariableNode $node)
+    public function visitVariableNode(VariableNode $node): Complex
     {
         $name = $node->getName();
 
@@ -178,14 +178,13 @@ class ComplexEvaluator implements Visitor
      * an elementary function recognized by StdMathLexer and StdMathParser.
      *
      *      FunctionNode is *not* recognized.
-     * @retval float
      * @see \MathParser\Lexer\StdMathLexer StdMathLexer
      * @see \MathParser\StdMathParser StdMathParser
      *
      * @param  FunctionNode             $node AST to be evaluated
      * @throws UnknownFunctionException if the function respresented by the
      */
-    public function visitFunctionNode(FunctionNode $node)
+    public function visitFunctionNode(FunctionNode $node): Complex
     {
         $z = $node->getOperand()->accept($this);
         $a = $z->r();
@@ -205,7 +204,7 @@ class ComplexEvaluator implements Visitor
             case 'cot':
                 return Complex::cot($z);
 
-            // Inverse trigonometric functions
+                // Inverse trigonometric functions
             case 'arcsin':
                 return Complex::arcsin($z);
 
@@ -279,7 +278,6 @@ class ComplexEvaluator implements Visitor
             default:
                 throw new UnknownFunctionException($node->getName());
         }
-
     }
 
     /**
@@ -288,14 +286,13 @@ class ComplexEvaluator implements Visitor
      * Returns the value of a ConstantNode recognized by StdMathLexer and StdMathParser.
      *
      *      ConstantNode is *not* recognized.
-     * @retval float
      * @see \MathParser\Lexer\StdMathLexer StdMathLexer
      * @see \MathParser\StdMathParser StdMathParser
      *
      * @param  ConstantNode             $node AST to be evaluated
      * @throws UnknownConstantException if the variable respresented by the
      */
-    public function visitConstantNode(ConstantNode $node)
+    public function visitConstantNode(ConstantNode $node): Complex
     {
         switch ($node->getName()) {
             case 'pi':

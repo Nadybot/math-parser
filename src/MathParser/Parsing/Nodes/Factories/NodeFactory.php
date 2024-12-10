@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
 * @package     Parsing
 * @author      Frank Wikström <frank@mossadal.se>
@@ -13,10 +15,11 @@
  * and related functionality.
  *
  */
+
 namespace MathParser\Parsing\Nodes\Factories;
 
-use MathParser\Parsing\Nodes\Factories\UnaryMinusNodeFactory;
 use MathParser\Parsing\Nodes\ExpressionNode;
+use MathParser\Parsing\Nodes\Node;
 
 /**
  * Helper class for creating ExpressionNodes.
@@ -38,37 +41,32 @@ use MathParser\Parsing\Nodes\ExpressionNode;
  * );
  * ~~~
  */
-class NodeFactory {
+class NodeFactory
+{
     /**
      * Factory for creating addition nodes
-     *
-     * @var AdditionNodeFactory $additionFactory;
      **/
-    protected $additionFactory;
+    protected AdditionNodeFactory $additionFactory;
+
     /**
      * Factory for creating subtraction nodes (including unary minus)
-     *
-     * @var SubtractionNodeFactory $subtractionFactory;
      **/
-    protected $subtractionFactory;
+    protected SubtractionNodeFactory $subtractionFactory;
+
     /**
      * Factory for creating multiplication nodes
-     *
-     * @var MultiplicationNodeFactory $multiplicationFactory;
      **/
-    protected $multiplicationFactory;
+    protected MultiplicationNodeFactory $multiplicationFactory;
+
     /**
      * Factory for creating division nodes
-     *
-     * @var DivisionByZeroException $divisionFactory;
      **/
-    protected $divisionFactory;
+    protected DivisionNodeFactory $divisionFactory;
+
     /**
      * Factory for creating exponentiation nodes
-     *
-     * @var ExponentiationNodeFactory $exponentiationFactory;
      **/
-    protected $exponentiationFactory;
+    protected ExponentiationNodeFactory $exponentiationFactory;
 
     /**
      * Constructor
@@ -84,13 +82,8 @@ class NodeFactory {
 
     /**
      * Create an addition node representing '$leftOperand + $rightOperand'.
-     *
-     * @param mixed $leftOperand
-     * @param mixed $rightOperand
-     * @retval ExpressionNode
-     *
      */
-    public function addition($leftOperand, $rightOperand)
+    public function addition(Node|int $leftOperand, Node|int $rightOperand): Node
     {
         return $this->additionFactory->makeNode($leftOperand, $rightOperand);
     }
@@ -98,63 +91,40 @@ class NodeFactory {
     /**
      * Create a subtraction node representing '$leftOperand - $rightOperand'.
      *
-     * @param mixed $leftOperand
-     * @param mixed $rightOperand
-     * @retval ExpressionNode
-     *
      */
-    public function subtraction($leftOperand, $rightOperand)
+    public function subtraction(Node|int $leftOperand, Node|int|null $rightOperand): Node
     {
         return $this->subtractionFactory->makeNode($leftOperand, $rightOperand);
     }
 
     /**
      * Create a multiplication node representing '$leftOperand * $rightOperand'.
-     *
-     * @param mixed $leftOperand
-     * @param mixed $rightOperand
-     * @retval ExpressionNode
-     *
      */
-    public function multiplication($leftOperand, $rightOperand)
+    public function multiplication(Node|int $leftOperand, Node|int $rightOperand): Node
     {
         return $this->multiplicationFactory->makeNode($leftOperand, $rightOperand);
     }
 
     /**
      * Create a division node representing '$leftOperand / $rightOperand'.
-     *
-     * @param mixed $leftOperand
-     * @param mixed $rightOperand
-     * @retval ExpressionNode
-     *
      */
-    public function division($leftOperand, $rightOperand)
+    public function division(Node|int $leftOperand, Node|int $rightOperand): Node
     {
         return $this->divisionFactory->makeNode($leftOperand, $rightOperand);
     }
 
     /**
      * Create an exponentiation node representing '$leftOperand ^ $rightOperand'.
-     *
-     * @param mixed $leftOperand
-     * @param mixed $rightOperand
-     * @retval ExpressionNode
-     *
      */
-    public function exponentiation($leftOperand, $rightOperand)
+    public function exponentiation(Node|int $leftOperand, Node|int $rightOperand): Node
     {
         return $this->exponentiationFactory->makeNode($leftOperand, $rightOperand);
     }
 
     /**
      * Create a unary minus node representing '-$operand'.
-     *
-     * @param mixed $operand
-     * @retval ExpressionNode
-     *
      */
-    public function unaryMinus($operand)
+    public function unaryMinus(Node|int|float $operand): Node
     {
         return $this->subtractionFactory->createUnaryMinusNode($operand);
     }
@@ -162,18 +132,16 @@ class NodeFactory {
     /**
      * Simplify the given ExpressionNode, using the appropriate factory.
      *
-     * @param ExpressionNode $node
-     * @retval Node Simplified version of the input
+     * @return Node Simplified version of the input
      */
-    public function simplify(ExpressionNode $node)
+    public function simplify(ExpressionNode $node): Node
     {
-        switch($node->getOperator()) {
-            case '+': return $this->addition($node->getLeft(), $node->getRight());
-            case '-': return $this->subtraction($node->getLeft(), $node->getRight());
-            case '*': return $this->multiplication($node->getLeft(), $node->getRight());
-            case '/': return $this->division($node->getLeft(), $node->getRight());
-            case '^': return $this->exponentiation($node->getLeft(), $node->getRight());
-        }
+        return match ($node->getOperator()) {
+            '+' => $this->addition($node->getLeft(), $node->getRight()),
+            '-' => $this->subtraction($node->getLeft(), $node->getRight()),
+            '*' => $this->multiplication($node->getLeft(), $node->getRight()),
+            '/' => $this->division($node->getLeft(), $node->getRight()),
+            '^' => $this->exponentiation($node->getLeft(), $node->getRight()),
+        };
     }
-
 }

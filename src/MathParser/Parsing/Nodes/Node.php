@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @package     Parsing
  * @author      Frank Wikström <frank@mossadal.se>
@@ -12,6 +14,7 @@
  *
  * Node classes for use in the generated abstract syntax trees (AST).
  */
+
 namespace MathParser\Parsing\Nodes;
 
 use MathParser\Interpreting\ASCIIPrinter;
@@ -27,9 +30,9 @@ use MathParser\Lexing\TokenType;
  */
 abstract class Node implements Visitable
 {
-    const NumericInteger = 1;
-    const NumericRational = 2;
-    const NumericFloat = 3;
+    public const NumericInteger = 1;
+    public const NumericRational = 2;
+    public const NumericFloat = 3;
 
     /**
      * Node factory, creating an appropriate Node from a Token.
@@ -41,7 +44,7 @@ abstract class Node implements Visitable
      * @return Node|null
      * @param Token $token Provided token
      */
-    public static function rationalFactory(Token $token)
+    public static function rationalFactory(Token $token): ?Node
     {
         switch ($token->getType()) {
             case TokenType::PosInt:
@@ -86,10 +89,9 @@ abstract class Node implements Visitable
      * token type is PosInt, Integer, RealNumber, Identifier or Constant
      * otherwise returns null.
      *
-     * @return Node|null
      * @param Token $token Provided token
      */
-    public static function factory(Token $token)
+    public static function factory(Token $token): ?Node
     {
         switch ($token->getType()) {
             case TokenType::PosInt:
@@ -131,10 +133,9 @@ abstract class Node implements Visitable
      * Helper function, comparing two ASTs. Useful for testing
      * and also for some AST transformers.
      *
-     * @return boolean
      * @param Node|null $other Compare to this tree
      */
-    abstract public function compareTo($other);
+    abstract public function compareTo(?Node $other): bool;
 
     /**
      * Convenience function for evaluating a tree, using

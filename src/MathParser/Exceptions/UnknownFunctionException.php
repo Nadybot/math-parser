@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @package     Exceptions
  * @author      Frank Wikström <frank@mossadal.se>
@@ -18,7 +20,7 @@ namespace MathParser\Exceptions;
 class UnknownFunctionException extends MathParserException
 {
     /** Constructor. Create a UnknownFunctionException */
-    public function __construct($operator)
+    public function __construct(string $operator)
     {
         parent::__construct("Unknown function $operator.");
 
@@ -27,11 +29,9 @@ class UnknownFunctionException extends MathParserException
 
     /**
      * Get the unkown function that was encountered.
-     *
-     * @return string
      */
-    public function getFunction()
+    public function getFunction(): string
     {
-    	return $this->data;
+        return $this->data;
     }
 }

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @author      Frank Wikström <frank@mossadal.se>
  * @copyright   2015 Frank Wikström
@@ -14,7 +16,6 @@ use MathParser\Exceptions\UnknownOperatorException;
 use MathParser\Exceptions\UnknownVariableException;
 use MathParser\Extensions\Math;
 use MathParser\Interpreting\Visitors\Visitor;
-use MathParser\Lexer\StdMathLexer;
 use MathParser\Parsing\Nodes\ConstantNode;
 use MathParser\Parsing\Nodes\ExpressionNode;
 use MathParser\Parsing\Nodes\FunctionNode;
@@ -49,16 +50,15 @@ use MathParser\Parsing\Nodes\VariableNode;
 class Evaluator implements Visitor
 {
     /**
-     * mixed[] $variables Key/value pair holding current values
-     *      of the variables used for evaluating.
-     *
+     * Key/value pair holding current values of the variables used for evaluating.
+     * @var array<string,mixed>
      */
-    private $variables;
+    private array $variables;
 
     /**
      * Constructor. Create an Evaluator with given variable values.
      *
-     * @param mixed $variables key-value array of variables with corresponding values.
+     * @param array<string,mixed> $variables key-value array of variables with corresponding values.
      */
     public function __construct($variables = [])
     {
@@ -69,7 +69,7 @@ class Evaluator implements Visitor
      * Update the variables used for evaluating
      *
      * @return void
-     * @param array $variables Key/value pair holding current variable values
+     * @param array<string,mixed> $variables Key/value pair holding current variable values
      */
     public function setVariables($variables)
     {
@@ -83,11 +83,10 @@ class Evaluator implements Visitor
      * where `op` is one of `+`, `-`, `*`, `/` or `^`
      *
      *      `+`, `-`, `*`, `/` or `^`
-     * @return float
      * @param  ExpressionNode           $node AST to be evaluated
      * @throws UnknownOperatorException if the operator is something other than
      */
-    public function visitExpressionNode(ExpressionNode $node)
+    public function visitExpressionNode(ExpressionNode $node): float
     {
         $operator = $node->getOperator();
 
@@ -123,6 +122,7 @@ class Evaluator implements Visitor
                     return pow($leftValue, $rightValue);
                 }
 
+                // no break
             default:
                 throw new UnknownOperatorException($operator);
         }
@@ -136,17 +136,17 @@ class Evaluator implements Visitor
      * @return float
      * @param NumberNode $node AST to be evaluated
      */
-    public function visitNumberNode(NumberNode $node)
+    public function visitNumberNode(NumberNode $node): int|float
     {
         return $node->getValue();
     }
 
-    public function visitIntegerNode(IntegerNode $node)
+    public function visitIntegerNode(IntegerNode $node): int|float
     {
         return $node->getValue();
     }
 
-    public function visitRationalNode(RationalNode $node)
+    public function visitRationalNode(RationalNode $node): int|float
     {
         return $node->getValue();
     }
@@ -164,7 +164,7 @@ class Evaluator implements Visitor
      * @param  VariableNode             $node AST to be evaluated
      * @throws UnknownVariableException if the variable respresented by the
      */
-    public function visitVariableNode(VariableNode $node)
+    public function visitVariableNode(VariableNode $node): mixed
     {
         $name = $node->getName();
 
@@ -189,9 +189,9 @@ class Evaluator implements Visitor
      * @param  FunctionNode             $node AST to be evaluated
      * @throws UnknownFunctionException if the function respresented by the
      */
-    public function visitFunctionNode(FunctionNode $node)
+    public function visitFunctionNode(FunctionNode $node): float
     {
-        $inner = $node->getOperand()->accept($this);
+        $inner = (float)$node->getOperand()->accept($this);
 
         switch ($node->getName()) {
             // Trigonometric functions
@@ -212,7 +212,7 @@ class Evaluator implements Visitor
 
                 return 1 / $tan_inner;
 
-            // Trigonometric functions, argument in degrees
+                // Trigonometric functions, argument in degrees
             case 'sind':
                 return sin(deg2rad($inner));
 
@@ -230,7 +230,7 @@ class Evaluator implements Visitor
 
                 return 1 / $tan_inner;
 
-            // Inverse trigonometric functions
+                // Inverse trigonometric functions
             case 'arcsin':
                 return asin($inner);
 
@@ -243,7 +243,7 @@ class Evaluator implements Visitor
             case 'arccot':
                 return pi() / 2 - atan($inner);
 
-            // Exponentials and logarithms
+                // Exponentials and logarithms
             case 'exp':
                 return exp($inner);
 
@@ -254,11 +254,11 @@ class Evaluator implements Visitor
             case 'lg':
                 return log10($inner);
 
-            // Powers
+                // Powers
             case 'sqrt':
                 return sqrt($inner);
 
-            // Hyperbolic functions
+                // Hyperbolic functions
             case 'sinh':
                 return sinh($inner);
 
@@ -276,7 +276,7 @@ class Evaluator implements Visitor
 
                 return 1 / $tanh_inner;
 
-            // Inverse hyperbolic functions
+                // Inverse hyperbolic functions
             case 'arsinh':
                 return asinh($inner);
 
@@ -307,7 +307,7 @@ class Evaluator implements Visitor
 
                 return Math::SemiFactorial($inner);
 
-            // Rounding functions
+                // Rounding functions
             case 'round':
                 return round($inner);
 
@@ -335,7 +335,7 @@ class Evaluator implements Visitor
      * @param  ConstantNode             $node AST to be evaluated
      * @throws UnknownConstantException if the variable respresented by the
      */
-    public function visitConstantNode(ConstantNode $node)
+    public function visitConstantNode(ConstantNode $node): float
     {
         switch ($node->getName()) {
             case 'pi':

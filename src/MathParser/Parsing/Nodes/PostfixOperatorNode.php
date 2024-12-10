@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @package     Parsing
  * @author      Frank Wikström <frank@mossadal.se>
@@ -18,18 +20,18 @@ use MathParser\Interpreting\Visitors\Visitor;
  */
 class PostfixOperatorNode extends Node
 {
-    /** string $name Name of the postfix operator. Currently, only '!' is possible. */
-    private $name;
+    /** Name of the postfix operator. Currently, only '!' is possible. */
+    private string $name;
 
     /** Constructor. Create a PostfixOperatorNode with given value. */
-    function __construct($name)
+    public function __construct(string $name)
     {
         $this->name = $name;
     }
 
 
     /** returns the name of the postfix operator */
-    public function getOperator()
+    public function getOperator(): string
     {
         return $this->name;
     }
@@ -37,13 +39,13 @@ class PostfixOperatorNode extends Node
     /**
      * Implementing the Visitable interface.
      */
-    public function accept(Visitor $visitor)
+    public function accept(Visitor $visitor): mixed
     {
         return null;
     }
 
     /** Implementing the compareTo abstract method. */
-    public function compareTo($other)
+    public function compareTo(?Node $other): bool
     {
         if ($other === null) {
             return false;
@@ -54,5 +56,4 @@ class PostfixOperatorNode extends Node
 
         return $this->getOperator() == $other->getOperator();
     }
-
 }

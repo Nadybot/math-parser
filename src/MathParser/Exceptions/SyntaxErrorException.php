@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @package     Exceptions
  * @author      Frank Wikström <frank@mossadal.se>
@@ -7,11 +9,11 @@
  *
  */
 
- namespace MathParser\Exceptions;
+namespace MathParser\Exceptions;
 
- /**
-  * Exception thrown when parsing expressions that are not well-formed.
-  */
+/**
+ * Exception thrown when parsing expressions that are not well-formed.
+ */
 class SyntaxErrorException extends MathParserException
 {
     /** Constructor. Create a SyntaxErrorException */

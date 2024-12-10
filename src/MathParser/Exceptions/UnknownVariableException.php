@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @package     Exceptions
  * @author      Frank Wikström <frank@mossadal.se>
@@ -7,16 +9,16 @@
  *
  */
 
- namespace MathParser\Exceptions;
+namespace MathParser\Exceptions;
 
- /**
-  * Exception thrown when parsing or evaluating expressions containing an
-  * unknown or undefined variable.
-  */
+/**
+ * Exception thrown when parsing or evaluating expressions containing an
+ * unknown or undefined variable.
+ */
 class UnknownVariableException extends MathParserException
 {
     /** Constructor. Create a UnknownVariableException */
-    public function __construct($variable)
+    public function __construct(string $variable)
     {
         parent::__construct("Unknown variable $variable.");
 
@@ -25,10 +27,8 @@ class UnknownVariableException extends MathParserException
 
     /**
      * Get the unkown variable.
-     *
-     * @retval string
      */
-    public function getVariable()
+    public function getVariable(): string
     {
         return $this->data;
     }

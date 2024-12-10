@@ -13,14 +13,15 @@ use MathParser\Interpreting\Differentiator;
 use MathParser\Interpreting\Evaluator;
 use MathParser\Interpreting\RationalEvaluator;
 
-use MathParser\StdMathParser;
 use MathParser\RationalMathParser;
 
-include '../vendor/autoload.php';
+include __DIR__ . '/../vendor/autoload.php';
 
 
-class ParserWithoutImplicitMultiplication extends Parser {
-    protected static function allowImplicitMultiplication() {
+class ParserWithoutImplicitMultiplication extends Parser
+{
+    protected static function allowImplicitMultiplication(): bool
+    {
         return false;
     }
 }
@@ -68,7 +69,7 @@ try {
 
     var_dump($derivative->accept($treeprinter));
     var_dump($derivative->accept($printer));
-} catch(\Exception $e) {
+} catch (\Exception $e) {
     var_dump($e->getMessage());
 }
 
@@ -76,7 +77,7 @@ try {
     echo "Evaluator: ";
     $evaluator = new Evaluator(['x' => 1, 'y' => 1.5 ]);
     var_dump($tree->accept($evaluator));
-} catch(\Exception $e) {
+} catch (\Exception $e) {
     var_dump($e->getMessage());
 }
 
@@ -84,6 +85,6 @@ try {
     echo "RationalEvaluator: ";
     $evaluator = new RationalEvaluator(['x' => '1/3', 'y' => -2]);
     var_dump($tree->accept($evaluator));
-} catch(\Exception $e) {
+} catch (\Exception $e) {
     var_dump($e->getMessage());
 }

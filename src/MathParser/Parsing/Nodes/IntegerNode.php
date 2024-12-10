@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @package     Parsing
  * @author      Frank Wikström <frank@mossadal.se>
@@ -14,34 +16,31 @@ use MathParser\Interpreting\Visitors\Visitor;
 /**
  * AST node representing a number (int or float)
  */
-class IntegerNode extends Node
+class IntegerNode extends NumericNode
 {
-    /** int|float $value The value of the represented number. */
-    private $value;
+    /** The value of the represented number. */
+    private int $value;
 
     /** Constructor. Create a NumberNode with given value. */
-    function __construct($value)
+    public function __construct(int $value)
     {
         $this->value = $value;
-
-        if (!is_int($value)) throw new \UnexpectedValueException();
     }
 
     /**
      * Returns the value
-     * @return int|float
      */
-    public function getValue()
+    public function getValue(): int
     {
         return $this->value;
     }
 
-    public function getNumerator()
+    public function getNumerator(): int
     {
         return $this->value;
     }
 
-    public function getDenominator()
+    public function getDenominator(): int
     {
         return 1;
     }
@@ -49,13 +48,13 @@ class IntegerNode extends Node
     /**
      * Implementing the Visitable interface.
      */
-    public function accept(Visitor $visitor)
+    public function accept(Visitor $visitor): mixed
     {
         return $visitor->visitIntegerNode($this);
     }
 
     /** Implementing the compareTo abstract method. */
-    public function compareTo($other)
+    public function compareTo(?Node $other): bool
     {
         if ($other === null) {
             return false;
@@ -67,7 +66,6 @@ class IntegerNode extends Node
             return false;
         }
 
-        return $this->getValue() == $other->getValue();
+        return $this->getValue() === $other->getValue();
     }
-    
 }

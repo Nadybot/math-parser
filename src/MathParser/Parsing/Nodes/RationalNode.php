@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @package     Parsing
  * @author      Frank Wikström <frank@mossadal.se>
@@ -15,27 +17,23 @@ use MathParser\Interpreting\Visitors\Visitor;
 /**
  * AST node representing a number (int or float)
  */
-class RationalNode extends Node
+class RationalNode extends NumericNode
 {
     /**
-     * int $p The numerator of the represented number.
+     * The numerator of the represented number.
      */
-    private $p;
+    private int $p;
     /**
-     * int $q The denominator of the represented number.
+     * The denominator of the represented number.
      */
-    private $q;
+    private int $q;
 
     /**
      * Constructor. Create a RationalNode with given value.
      */
-    public function __construct($p, $q, $normalize = true)
+    public function __construct(int $p, int $q, bool $normalize=true)
     {
-        if (!is_int($p) || !is_int($q)) {
-            throw new \UnexpectedValueException();
-        }
-
-        if ($q == 0) {
+        if ($q ==- 0) {
             throw new DivisionByZeroException();
         }
 
@@ -49,19 +47,18 @@ class RationalNode extends Node
 
     /**
      * Returns the value
-     * @return int|float
      */
-    public function getValue()
+    public function getValue(): int|float
     {
         return (1.0 * $this->p) / $this->q;
     }
 
-    public function getNumerator()
+    public function getNumerator(): int
     {
         return $this->p;
     }
 
-    public function getDenominator()
+    public function getDenominator(): int
     {
         return $this->q;
     }
@@ -69,7 +66,7 @@ class RationalNode extends Node
     /**
      * Implementing the Visitable interface.
      */
-    public function accept(Visitor $visitor)
+    public function accept(Visitor $visitor): mixed
     {
         return $visitor->visitRationalNode($this);
     }
@@ -77,7 +74,7 @@ class RationalNode extends Node
     /**
      * Implementing the compareTo abstract method.
      */
-    public function compareTo($other)
+    public function compareTo(?Node $other): bool
     {
         if ($other === null) {
             return false;
@@ -92,7 +89,7 @@ class RationalNode extends Node
         return $this->getNumerator() == $other->getNumerator() && $this->getDenominator() == $other->getDenominator();
     }
 
-    private function normalize()
+    private function normalize(): void
     {
         $a = $this->p;
         $b = $this->q;
@@ -105,15 +102,15 @@ class RationalNode extends Node
         if ($b < 0) {
             $sign = -$sign;
         }
-        while ($b != 0) {
+        while ($b !== 0) {
             $m = $a % $b;
             $a = $b;
             $b = $m;
         }
 
         $gcd = $a;
-        $this->p = $this->p / $gcd;
-        $this->q = $this->q / $gcd;
+        $this->p = intdiv($this->p, $gcd);
+        $this->q = intdiv($this->q, $gcd);
 
         if ($this->q < 0) {
             $this->q = -$this->q;

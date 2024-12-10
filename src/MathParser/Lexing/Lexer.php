@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @package     Lexical analysis
  * @author      Frank Wikström <frank@mossadal.se>
@@ -16,6 +18,7 @@
  * of tokens, representing discrete parts of the input each carrying certain meaning.
  *
  */
+
 namespace MathParser\Lexing;
 
 use MathParser\Exceptions\UnknownTokenException;
@@ -39,9 +42,10 @@ use MathParser\Exceptions\UnknownTokenException;
 class Lexer
 {
     /**
-     * TokenDefinition[] $tokenDefinition list of tokens recognized by the Lexer.
+     * List of tokens recognized by the Lexer.
+     * @var list<TokenDefinition>
      */
-    private $tokenDefinitions = [];
+    private array $tokenDefinitions = [];
 
     /**
      * Add a Token to the list of tokens recognized by the Lexer.
@@ -49,10 +53,9 @@ class Lexer
      * Adds the supplied TokenDefinition at the end of the list of known
      * tokens.
      *
-     * @return void
      * @param TokenDefinition $tokenDefinition token to add to the list of known tokens.
      */
-    public function add(TokenDefinition $tokenDefinition)
+    public function add(TokenDefinition $tokenDefinition): void
     {
         $this->tokenDefinitions[] = $tokenDefinition;
     }
@@ -66,12 +69,11 @@ class Lexer
      * care should be taken to add `sinh` before `sin`, otherwise the lexer will
      * never match a `sinh`.
      *
-     * @return Token[] sequence of recognized tokens
-     *      that doesn't match any knwon token.
+     * @return list<Token> sequence of recognized tokens that doesn't match any knwon token.
      * @param  string                $input  String to tokenize.
      * @throws UnknownTokenException throwns when encountering characters in the input string
      */
-    public function tokenize($input)
+    public function tokenize(string $input): array
     {
         // The list of tokens we'll eventually return
         $tokens = [];
@@ -107,7 +109,7 @@ class Lexer
      * @return Token|null Matched token
      * @param string $input
      */
-    private function findMatchingToken($input)
+    private function findMatchingToken(string $input): ?Token
     {
         // Check with all tokenDefinitions
         foreach ($this->tokenDefinitions as $tokenDefinition) {

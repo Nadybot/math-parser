@@ -17,7 +17,7 @@ class DifferentiatorTest extends TestCase
     private $parser;
     private $differentiator;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->parser = new RationalMathParser();
         $this->differentiator = new Differentiator('x');
@@ -180,7 +180,6 @@ class DifferentiatorTest extends TestCase
     public function testCanDifferentiateComposite()
     {
         $this->assertResult('sin(sin(x))', 'cos(x)*cos(sin(x))');
-
     }
 
     public function testCanDifferentiateUnaryMinus()
@@ -194,7 +193,6 @@ class DifferentiatorTest extends TestCase
         $this->expectException(UnknownFunctionException::class);
 
         $this->diff($node);
-
     }
 
     public function testCannotDifferentiateUnknownOperator()
@@ -206,7 +204,6 @@ class DifferentiatorTest extends TestCase
         $this->expectException(UnknownOperatorException::class);
 
         $this->diff($node);
-
     }
 
     public function testCanDifferentiateHyperbolicFunctions()
@@ -253,5 +250,4 @@ class DifferentiatorTest extends TestCase
         $this->expectException(UnknownFunctionException::class);
         $this->diff($f);
     }
-
 }

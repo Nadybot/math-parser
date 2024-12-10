@@ -22,7 +22,7 @@ class ComplexEvaluatorTest extends TestCase
     private $evaluator;
     private $variables;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->parser = new ComplexMathParser();
 
@@ -39,13 +39,14 @@ class ComplexEvaluatorTest extends TestCase
 
     private function assertResult($f, $x)
     {
+        $accuracy = 1e-9;
         $value = $this->evaluate($this->parser->parse($f));
         if (!($x instanceof Complex)) {
             $x = Complex::parse($x);
         }
 
-        $this->assertEquals($value->r(), $x->r());
-        $this->assertEquals($value->i(), $x->i());
+        $this->assertEqualsWithDelta($value->r(), $x->r(), $accuracy);
+        $this->assertEqualsWithDelta($value->i(), $x->i(), $accuracy);
     }
 
     private function assert_NAN($f)

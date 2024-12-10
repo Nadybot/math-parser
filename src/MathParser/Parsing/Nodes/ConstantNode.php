@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @package     Parsing
  * @author      Frank Wikström <frank@mossadal.se>
@@ -21,7 +23,7 @@ class ConstantNode extends Node
      *
      * string $value
      **/
-    private $value;
+    private string $value;
 
     /**
      * Constructor.
@@ -33,7 +35,7 @@ class ConstantNode extends Node
      * ~~~
      *
      */
-    function __construct($value)
+    public function __construct(string $value)
     {
         $this->value = $value;
     }
@@ -42,9 +44,8 @@ class ConstantNode extends Node
     * @property getName
     *
     * Returns the name of the constant
-    * @return string
     */
-    public function getName()
+    public function getName(): string
     {
         return $this->value;
     }
@@ -52,13 +53,13 @@ class ConstantNode extends Node
     /**
      * Implementing the Visitable interface.
      */
-    public function accept(Visitor $visitor)
+    public function accept(Visitor $visitor): mixed
     {
         return $visitor->visitConstantNode($this);
     }
 
     /** Implementing the compareTo abstract method. */
-    public function compareTo($other)
+    public function compareTo(?Node $other): bool
     {
         if ($other === null) {
             return false;
@@ -69,5 +70,4 @@ class ConstantNode extends Node
 
         return $this->getName() == $other->getName();
     }
-
 }

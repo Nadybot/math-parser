@@ -9,6 +9,7 @@ use MathParser\Interpreting\Evaluator;
 use MathParser\Parsing\Nodes\ConstantNode;
 use MathParser\Parsing\Nodes\ExpressionNode;
 use MathParser\Parsing\Nodes\FunctionNode;
+use MathParser\Parsing\Nodes\Node;
 use MathParser\Parsing\Nodes\NumberNode;
 use MathParser\Parsing\Nodes\VariableNode;
 use MathParser\RationalMathParser;
@@ -17,12 +18,13 @@ use PHPUnit\Framework\TestCase;
 
 class EvaluatorTest extends TestCase
 {
-    private $parser;
-    private $rparser;
-    private $evaluator;
-    private $variables;
+    private StdMathParser $parser;
+    private RationalMathParser $rparser;
+    private Evaluator $evaluator;
+    /** @var array<string,string> */
+    private array $variables = [];
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->parser = new StdMathParser();
         $this->rparser = new RationalMathParser();
@@ -45,14 +47,15 @@ class EvaluatorTest extends TestCase
 
     private function assertResult($f, $x)
     {
+        $accuracy = 1e-9;
         $value = $this->evaluate($this->parser->parse($f));
-        $this->assertEquals($value, $x);
+        $this->assertEqualsWithDelta($value, $x, $accuracy);
     }
 
     private function assertApproximateResult($f, $x)
     {
         $value = $this->evaluate($this->parser->parse($f));
-        $this->assertEquals($value, $x, '', 1e-7);
+        $this->assertEqualsWithDelta($value, $x, 1e-7);
     }
 
     private function assert_NAN($f)
@@ -200,7 +203,6 @@ class EvaluatorTest extends TestCase
         $value = $this->evaluate($f);
 
         $this->assertNaN($value);
-
     }
 
     public function testCanEvaluateArccos()
@@ -213,7 +215,6 @@ class EvaluatorTest extends TestCase
         $value = $this->evaluate($f);
 
         $this->assertNaN($value);
-
     }
 
     public function testCanEvaluateArctan()
@@ -311,7 +312,6 @@ class EvaluatorTest extends TestCase
 
         $this->expectException(UnknownFunctionException::class);
         $value = $this->evaluate($f);
-
     }
 
     public function testCannotEvaluateUnknownOperator()
@@ -323,7 +323,6 @@ class EvaluatorTest extends TestCase
         $this->expectException(UnknownOperatorException::class);
 
         $this->evaluate($node);
-
     }
 
     public function testCanCreateTemporaryUnaryMinusNode()
@@ -351,7 +350,6 @@ class EvaluatorTest extends TestCase
 
         $this->assert_NAN('0*log(0)');
         $this->assertResult('0^0', 1);
-
     }
 
     public function testCanComputeExponentialsTwoWays()
@@ -377,5 +375,4 @@ class EvaluatorTest extends TestCase
         $this->assertResult('ceil(2*2.3)', 5);
         $this->assertResult('round(2*2.3)', 5);
     }
-
 }

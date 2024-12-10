@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @package     Exceptions
  * @author      Frank Wikström <frank@mossadal.se>
@@ -7,18 +9,18 @@
  *
  */
 
- namespace MathParser\Exceptions;
+namespace MathParser\Exceptions;
 
- /**
-  * Exception thrown when parsing or evaluating expressions containing an
-  * unknown constant.
-  *
-  * This should not happen under normal circumstances.
-  */
+/**
+ * Exception thrown when parsing or evaluating expressions containing an
+ * unknown constant.
+ *
+ * This should not happen under normal circumstances.
+ */
 class UnknownConstantException extends MathParserException
 {
     /** Constructor. Create a UnknownConstantException. */
-    public function __construct($operator)
+    public function __construct(string $operator)
     {
         parent::__construct("Unknown constant $operator.");
 
@@ -27,10 +29,8 @@ class UnknownConstantException extends MathParserException
 
     /**
      * Get the unkown constant that was encountered.
-     *
-     * @return string
      */
-    public function getConstant()
+    public function getConstant(): string
     {
         return $this->data;
     }

@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @package     Lexical analysis
  * @subpackage  Token handling
@@ -10,9 +12,6 @@
 
 namespace MathParser\Lexing;
 
-use MathParser\Lexing\TokenPrecedence;
-use MathParser\Lexing\TokenAssociativity;
-
 /**
  * Token class
  *
@@ -22,13 +21,12 @@ use MathParser\Lexing\TokenAssociativity;
  */
 class Token
 {
-
     /** string $value (Standadized) value of token. */
-    private $value;
+    private string $value;
     /** int $type Token type as defined in TokenType class */
-    private $type;
+    private int $type;
     /** string $match The actual string matched in the input. */
-    private $match;
+    private string $match;
 
     /**
      * Public constructor
@@ -51,11 +49,11 @@ class Token
      * @param int $type Token type, as defined by the TokenType class
      * @param string $match Optional actual match in the input string
      */
-    public function __construct($value, $type, $match=null)
+    public function __construct(string $value, int $type, ?string $match=null)
     {
         $this->value = $value;
         $this->type = $type;
-        $this->match = $match ? $match : $value;
+        $this->match = $match ?? $value;
     }
 
     /**
@@ -64,7 +62,7 @@ class Token
      *
      * @return int length of string matching the token.
      */
-    public function length()
+    public function length(): int
     {
         return strlen($this->match);
     }
@@ -76,7 +74,7 @@ class Token
      *
      * @return string value of token
      */
-    public function getValue()
+    public function getValue(): string
     {
         return $this->value;
     }
@@ -87,17 +85,15 @@ class Token
      *
      * @return int token type (as defined by TokenType)
      */
-    public function getType()
+    public function getType(): int
     {
         return $this->type;
     }
 
     /**
      * Helper function, converting the Token to a printable string.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return "Token: [$this->value, $this->type]";
     }
@@ -112,12 +108,12 @@ class Token
      * or a a closing parenthesis, and the second token is a nullary operator
      * or an opening parenthesis. (Unless the first token is a a function name,
      * and the second is an opening parentheis.)
-     *
-     * @return boolean
      */
-    public static function canFactorsInImplicitMultiplication($token1, $token2)
+    public static function canFactorsInImplicitMultiplication(?Token $token1, ?Token $token2): bool
     {
-        if ($token1 === null || $token2 === null) return false;
+        if ($token1 === null || $token2 === null) {
+            return false;
+        }
 
         $check1 = (
             $token1->type == TokenType::PosInt ||
@@ -131,7 +127,9 @@ class Token
             $token1->type == TokenType::SemiFactorialOperator
         );
 
-        if (!$check1) return false;
+        if (!$check1) {
+            return false;
+        }
 
         $check2 = (
             $token2->type == TokenType::PosInt ||
@@ -143,10 +141,13 @@ class Token
             $token2->type == TokenType::OpenParenthesis
         );
 
-        if (!$check2) return false;
-
-        if ($token1->type == TokenType::FunctionName && $token2->type == TokenType::OpenParenthesis)
+        if (!$check2) {
             return false;
+        }
+
+        if ($token1->type == TokenType::FunctionName && $token2->type == TokenType::OpenParenthesis) {
+            return false;
+        }
 
         return true;
     }

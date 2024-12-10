@@ -21,10 +21,9 @@ class MathTest extends TestCase
 
     public function testLogGamma()
     {
-        $this->assertEquals(857.9336698, Math::logGamma(200), '', 3e-7);
-        $this->assertEquals(log(120), Math::logGamma(6), '', 3e-9);
-        $this->assertEquals(3.9578139676187, Math::logGamma(5.5), '', 3e-9);
-
+        $this->assertEqualsWithDelta(857.9336698, Math::logGamma(200), 3e-7, '');
+        $this->assertEqualsWithDelta(log(120), Math::logGamma(6), 3e-9, '');
+        $this->assertEqualsWithDelta(3.9578139676187, Math::logGamma(5.5), 3e-9, '');
     }
 
     public function testFactorial()
@@ -45,5 +44,4 @@ class MathTest extends TestCase
         $this->assertEquals(48, Math::SemiFactorial(6));
         $this->assertEquals(105, Math::SemiFactorial(7));
     }
-
 }

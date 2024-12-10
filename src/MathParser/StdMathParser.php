@@ -1,8 +1,11 @@
-<?php 
+<?php
+
+declare(strict_types=1);
 
 namespace MathParser;
 
 use MathParser\Lexing\StdMathLexer;
+use MathParser\Parsing\Nodes\Node;
 use MathParser\Parsing\Parser;
 
 /**
@@ -36,25 +39,22 @@ use MathParser\Parsing\Parser;
  */
 class StdMathParser extends AbstractMathParser
 {
-
-    public function __construct()
-    {
+    public function __construct(
+    ) {
         $this->lexer = new StdMathLexer();
         $this->parser = new Parser();
     }
-    
+
     /**
      * Parse the given mathematical expression into an abstract syntax tree.
      *
      * @param string $text Input
-     * @return Node
      */
-    public function parse($text)
+    public function parse(string $text): Node
     {
         $this->tokens = $this->lexer->tokenize($text);
         $this->tree = $this->parser->parse($this->tokens);
 
         return $this->tree;
     }
-    
 }

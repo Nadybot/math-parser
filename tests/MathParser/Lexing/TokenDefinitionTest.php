@@ -8,7 +8,7 @@ class TokenDefinitionTest extends TestCase
 {
     private $tokenDefinition;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->tokenDefinition = new TokenDefinition('/\d+/', TokenType::PosInt);
     }

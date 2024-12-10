@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * @author      Frank Wikström <frank@mossadal.se>
  * @copyright   2015 Frank Wikström
@@ -15,7 +17,6 @@ use MathParser\Parsing\Nodes\FunctionNode;
 use MathParser\Parsing\Nodes\ConstantNode;
 use MathParser\Parsing\Nodes\IntegerNode;
 use MathParser\Parsing\Nodes\RationalNode;
-
 
 /**
  * Simple string representation of an AST. Probably most
@@ -37,17 +38,16 @@ class TreePrinter implements Visitor
 {
     /**
      * Print an ExpressionNode.
-     *
-     * @param ExpressionNode $node
      */
-    public function visitExpressionNode(ExpressionNode $node)
+    public function visitExpressionNode(ExpressionNode $node): string
     {
         $leftValue = $node->getLeft()->accept($this);
         $operator = $node->getOperator();
 
         // The operator and the right side are optional, remember?
-        if (!$operator)
+        if (!$operator) {
             return "$leftValue";
+        }
 
         $right = $node->getRight();
 
@@ -57,25 +57,22 @@ class TreePrinter implements Visitor
         } else {
             return "($operator, $leftValue)";
         }
-
     }
 
     /**
      * Print a NumberNode.
-     *
-     * @param NumerNode $node
      */
-    public function visitNumberNode(NumberNode $node)
+    public function visitNumberNode(NumberNode $node): string
     {
         $val = $node->getValue();
         return "$val:float";
     }
-    public function visitIntegerNode(IntegerNode $node)
+    public function visitIntegerNode(IntegerNode $node): string
     {
         $val = $node->getValue();
         return "$val:int";
     }
-    public function visitRationalNode(RationalNode $node)
+    public function visitRationalNode(RationalNode $node): string
     {
         $p = $node->getNumerator();
         $q = $node->getDenominator();
@@ -84,10 +81,8 @@ class TreePrinter implements Visitor
 
     /**
      * Print a VariableNode.
-     *
-     * @param VariableNode $node
      */
-    public function visitVariableNode(VariableNode $node)
+    public function visitVariableNode(VariableNode $node): string
     {
         return $node->getName();
     }
@@ -97,7 +92,7 @@ class TreePrinter implements Visitor
      *
      * @param FunctionNode $node
      */
-    public function visitFunctionNode(FunctionNode $node)
+    public function visitFunctionNode(FunctionNode $node): string
     {
         $functionName = $node->getName();
         $operand = $node->getOperand()->accept($this);
@@ -110,7 +105,7 @@ class TreePrinter implements Visitor
      *
      * @param ConstantNode $node
      */
-    public function visitConstantNode(ConstantNode $node)
+    public function visitConstantNode(ConstantNode $node): string
     {
         return $node->getName();
     }

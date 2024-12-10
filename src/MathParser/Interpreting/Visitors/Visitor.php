@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
  * Visitable interface
  *
@@ -36,47 +38,47 @@ interface Visitor
      *
      * @param ExpressionNode $node Node to visit.
      **/
-    function visitExpressionNode(ExpressionNode $node);
+    public function visitExpressionNode(ExpressionNode $node): mixed;
 
     /**
      * Interface function for visiting NumberNodes
      *
      * @param NumberNode $node Node to visit.
      **/
-    function visitNumberNode(NumberNode $node);
+    public function visitNumberNode(NumberNode $node): mixed;
 
     /**
      * Interface function for visiting IntegerNodes
      *
      * @param IntegerNode $node Node to visit.
      **/
-    function visitIntegerNode(IntegerNode $node);
+    public function visitIntegerNode(IntegerNode $node): mixed;
 
     /**
      * Interface function for visiting RationalNodes
      *
      * @param RationalNode $node Node to visit.
      **/
-    function visitRationalNode(RationalNode $node);
+    public function visitRationalNode(RationalNode $node): mixed;
 
     /**
      * Interface function for visiting VariableNodes
      *
      * @param VariableNode $node Node to visit.
      **/
-    function visitVariableNode(VariableNode $node);
+    public function visitVariableNode(VariableNode $node): mixed;
 
     /**
      * Interface function for visiting FunctionNode
      *
      * @param FunctionNode $node Node to visit.
      **/
-    function visitFunctionNode(FunctionNode $node);
+    public function visitFunctionNode(FunctionNode $node): mixed;
 
     /**
      * Interface function for visiting ConstantNode
      *
      * @param ConstantNode $node Node to visit.
      **/
-    function visitConstantNode(ConstantNode $node);
+    public function visitConstantNode(ConstantNode $node): mixed;
 }
