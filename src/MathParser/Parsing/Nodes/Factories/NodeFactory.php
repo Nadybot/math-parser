@@ -65,32 +65,32 @@ class NodeFactory {
 		$this->exponentiationFactory = new ExponentiationNodeFactory();
 	}
 
-	/** Create an addition node representing '$leftOperand + $rightOperand'. */
+	/** Create an addition node representing `$leftOperand + $rightOperand`. */
 	public function addition(Node|int|float $leftOperand, Node|int|float $rightOperand): Node {
 		return $this->additionFactory->makeNode($leftOperand, $rightOperand);
 	}
 
-	/** Create a subtraction node representing '$leftOperand - $rightOperand'. */
+	/** Create a subtraction node representing `$leftOperand - $rightOperand`. */
 	public function subtraction(Node|int|float $leftOperand, null|Node|int|float $rightOperand): Node {
 		return $this->subtractionFactory->makeNode($leftOperand, $rightOperand);
 	}
 
-	/** Create a multiplication node representing '$leftOperand * $rightOperand'. */
+	/** Create a multiplication node representing `$leftOperand * $rightOperand`. */
 	public function multiplication(Node|int|float $leftOperand, Node|int|float $rightOperand): Node {
 		return $this->multiplicationFactory->makeNode($leftOperand, $rightOperand);
 	}
 
-	/** Create a division node representing '$leftOperand / $rightOperand'. */
+	/** Create a division node representing `$leftOperand / $rightOperand`. */
 	public function division(Node|int|float $leftOperand, Node|int|float $rightOperand): Node {
 		return $this->divisionFactory->makeNode($leftOperand, $rightOperand);
 	}
 
-	/** Create an exponentiation node representing '$leftOperand ^ $rightOperand'. */
+	/** Create an exponentiation node representing `$leftOperand ^ $rightOperand`. */
 	public function exponentiation(Node|int|float $leftOperand, Node|int|float $rightOperand): Node {
 		return $this->exponentiationFactory->makeNode($leftOperand, $rightOperand);
 	}
 
-	/** Create a unary minus node representing '-$operand'. */
+	/** Create a unary minus node representing `-$operand`. */
 	public function unaryMinus(Node|int|float $operand): Node {
 		return $this->subtractionFactory->createUnaryMinusNode($operand);
 	}

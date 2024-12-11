@@ -10,7 +10,6 @@
             </property>
             <property name="skipDirs" type="array">
                 <element value="vendor"/>
-                <element value="Stubs"/>
             </property>
         </properties>
     </rule>

@@ -48,7 +48,7 @@ class Differentiator implements Visitor {
 	/** Variable that we differentiate with respect to */
 	protected string $variable;
 
-	/** NodeFactory $nodeFactory used for building the resulting AST. */
+	/** Used for building the resulting AST. */
 	protected NodeFactory $nodeFactory;
 
 	/**

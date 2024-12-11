@@ -16,7 +16,7 @@
         "phpstan/phpstan": "^1.12.3",
         "phpstan/phpstan-deprecation-rules": "^1.0",
         "composer-phar/php-cs-fixer": " ^3.51.0",
-        "nadybot/nadystyle": "^1.0.0",
+        "nadybot/nadystyle": "1.0.0",
         "phpstan/phpstan-strict-rules": "^1.5"
     },
     "require-dev": {
@@ -30,5 +30,14 @@
             "MathParser\\": "src/MathParser",
             "Tests\\MathParser\\": "tests/MathParser"
         }
+    },
+
+    "scripts": {
+        "phpstan": "phpstan --memory-limit=1G",
+        "test": "phpunit -c phpunit.xml",
+        "coverage": [
+            "@putenv XDEBUG_MODE=coverage",
+            "phpunit -c phpunit.xml --coverage-text"
+        ]
     }
 }

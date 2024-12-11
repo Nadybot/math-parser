@@ -25,10 +25,10 @@ use MathParser\Exceptions\{DivisionByZeroException, SyntaxErrorException};
  * ```
  */
 class Complex {
-	/** float $x real part */
+	/** Real part */
 	private float $x;
 
-	/** float $y real part */
+	/** Imaginary part */
 	private float $y;
 
 	/**

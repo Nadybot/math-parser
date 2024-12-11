@@ -17,10 +17,10 @@ use MathParser\Interpreting\Visitors\Visitor;
  * AST node representing a function applications (e.g. sin(...))
  */
 class FunctionNode extends Node {
-	/** string $name Function name, e.g. 'sin' */
+	/** Function name, e.g. 'sin' */
 	private string $name;
 
-	/** Node $operand AST of function operand */
+	/** AST of function operand */
 	private ?Node $operand=null;
 
 	/** Constructor, create a FunctionNode with given name and operand */

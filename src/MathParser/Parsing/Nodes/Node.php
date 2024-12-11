@@ -213,23 +213,11 @@ abstract class Node implements Visitable {
 	 * @return bool
 	 */
 	public function isTerminal() {
-		if ($this instanceof NumberNode) {
-			return true;
-		}
-
-		if ($this instanceof IntegerNode) {
-			return true;
-		}
-
-		if ($this instanceof RationalNode) {
-			return true;
-		}
-
-		if ($this instanceof VariableNode) {
-			return true;
-		}
-
-		return $this instanceof ConstantNode;
+		return ($this instanceof NumberNode)
+			|| ($this instanceof IntegerNode)
+			|| ($this instanceof RationalNode)
+			|| ($this instanceof VariableNode)
+			|| ($this instanceof ConstantNode);
 	}
 
 	public function getOperator(): string {

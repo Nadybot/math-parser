@@ -12,8 +12,6 @@ namespace MathParser;
 *
 */
 
-
-
 use MathParser\Lexing\ComplexLexer;
 use MathParser\Parsing\Nodes\Node;
 use MathParser\Parsing\Parser;

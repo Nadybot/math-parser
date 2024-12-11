@@ -22,16 +22,16 @@ use MathParser\Parsing\Nodes\Traits\Sanitize;
 class ExpressionNode extends Node {
 	use Sanitize;
 
-	/** Node $left Left operand */
+	/** Left operand */
 	private ?Node $left=null;
 
-	/** string $operator Operator, e.g. '+', '-', '*', '/' or '^' */
+	/** Operator, e.g. '+', '-', '*', '/' or '^' */
 	private ?string $operator=null;
 
-	/** Node $right Right operand */
+	/** Right operand */
 	private ?Node $right=null;
 
-	/** int $precedence Precedence. Operators with higher prcedence bind harder */
+	/** Operators with higher prcedence bind harder */
 	private int $precedence;
 
 	/** Associativity of operator. */
