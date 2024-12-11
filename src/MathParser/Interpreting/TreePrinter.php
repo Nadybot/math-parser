@@ -9,7 +9,7 @@ declare(strict_types=1);
 
 namespace MathParser\Interpreting;
 
-use MathParser\Interpreting\Visitors\Visitor;
+use MathParser\Interpreting\Visitors\VisitorInterface;
 use MathParser\Parsing\Nodes\{ConstantNode, ExpressionNode, FunctionNode, IntegerNode, NumberNode, RationalNode, VariableNode};
 
 /**
@@ -28,7 +28,7 @@ use MathParser\Parsing\Nodes\{ConstantNode, ExpressionNode, FunctionNode, Intege
  * result = $f->accept($printer);    // Generates "(+ (exp (* 2 x)) (* x y))"
  * ```
  */
-class TreePrinter implements Visitor {
+class TreePrinter implements VisitorInterface {
 	/** Print an ExpressionNode. */
 	public function visitExpressionNode(ExpressionNode $node): string {
 		$leftValue = $node->getLeft()->accept($this);
@@ -46,7 +46,6 @@ class TreePrinter implements Visitor {
 			return "({$operator}, {$leftValue}, {$rightValue})";
 		}
 			return "({$operator}, {$leftValue})";
-
 	}
 
 	/** Print a NumberNode. */

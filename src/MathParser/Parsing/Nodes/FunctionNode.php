@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace MathParser\Parsing\Nodes;
 
-use MathParser\Interpreting\Visitors\Visitor;
+use MathParser\Interpreting\Visitors\VisitorInterface;
 
 /**
  * AST node representing a function applications (e.g. sin(...))
@@ -52,7 +52,7 @@ class FunctionNode extends Node {
 	}
 
 	/** Implementing the Visitable interface. */
-	public function accept(Visitor $visitor): mixed {
+	public function accept(VisitorInterface $visitor): mixed {
 		return $visitor->visitFunctionNode($this);
 	}
 

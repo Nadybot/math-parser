@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace MathParser\Parsing\Nodes;
 
-use MathParser\Interpreting\Visitors\Visitor;
+use MathParser\Interpreting\Visitors\VisitorInterface;
 
 /**
  * AST node representing a postfix operator. Only for temporary
@@ -22,7 +22,7 @@ class PostfixOperatorNode extends Node {
 	/** Name of the postfix operator. Currently, only '!' is possible. */
 	private string $name;
 
-	/** Constructor. Create a PostfixOperatorNode with given value. */
+	/** Create a PostfixOperatorNode with given value. */
 	public function __construct(string $name) {
 		$this->name = $name;
 	}
@@ -33,7 +33,7 @@ class PostfixOperatorNode extends Node {
 	}
 
 	/** Implementing the Visitable interface. */
-	public function accept(Visitor $visitor): mixed {
+	public function accept(VisitorInterface $visitor): mixed {
 		return null;
 	}
 

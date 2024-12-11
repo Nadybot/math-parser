@@ -24,7 +24,7 @@ use MathParser\Parsing\Nodes\Node;
  * implementations of the interface, usually involves
  * some simplification of the operands.
  */
-interface ExpressionNodeFactory {
+interface ExpressionNodeFactoryInterface {
 	/** Factory method to create an ExpressionNode with given operands. */
 	public function makeNode(int|Node $leftOperand, int|Node $rightOperand): Node;
 }

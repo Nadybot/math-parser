@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace MathParser\Parsing\Nodes;
 
-use MathParser\Interpreting\Visitors\Visitor;
+use MathParser\Interpreting\Visitors\VisitorInterface;
 
 /**
  * AST node representing a variable
@@ -20,7 +20,7 @@ class VariableNode extends Node {
 	/** Name of represented variable, e.g. 'x' */
 	private string $name;
 
-	/** Constructor. Create a VariableNode with a given variable name. */
+	/** Create a VariableNode with a given variable name. */
 	public function __construct(string $name) {
 		$this->name = $name;
 	}
@@ -31,7 +31,7 @@ class VariableNode extends Node {
 	}
 
 	/** Implementing the Visitable interface. */
-	public function accept(Visitor $visitor): mixed {
+	public function accept(VisitorInterface $visitor): mixed {
 		return $visitor->visitVariableNode($this);
 	}
 

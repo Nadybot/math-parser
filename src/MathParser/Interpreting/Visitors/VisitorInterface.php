@@ -24,7 +24,7 @@ use MathParser\Parsing\Nodes\{ConstantNode, ExpressionNode, FunctionNode, Intege
  * Implemented by every interpreter. The interface specifies
  * functions for visiting and handling each Node subclass.
  */
-interface Visitor {
+interface VisitorInterface {
 	/**
 	 * Interface function for visiting ExpressionNodes
 	 *

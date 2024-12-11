@@ -9,40 +9,35 @@ declare(strict_types=1);
 *
 */
 
-/** @namespace MathParser::Parsing::Nodes::Traits
- *
- * Traits for Nodes
- */
-
 namespace MathParser\Parsing\Nodes\Traits;
 
-use MathParser\Parsing\Nodes\{IntegerNode, Node, NumberNode, NumericNode, RationalNode};
+use MathParser\Parsing\Nodes\{IntegerNode, Node, NodeOrder, NumberNode, NumericNode, RationalNode};
 
 /**
  * Trait for upgrading numbers (ints and floats) to NumberNode,
  * making it possible to call the Node constructors directly
  * with numbers, making the code cleaner.
  */
-trait Numeric {
+trait NumericTrait {
 	protected function isNumeric(?Node $operand): bool {
 		return $operand instanceof NumericNode;
 	}
 
-	protected function orderType(?Node $node): int {
+	protected function orderType(?Node $node): NodeOrder {
 		if ($node instanceof IntegerNode) {
-			return Node::NUMERIC_INTEGER;
+			return NodeOrder::Integer;
 		}
 		if ($node instanceof RationalNode) {
-			return Node::NUMERIC_RATIONAL;
+			return NodeOrder::Rational;
 		}
 		if ($node instanceof NumberNode) {
-			return Node::NUMERIC_FLOAT;
+			return NodeOrder::Float;
 		}
 
-		return 0;
+		return NodeOrder::None;
 	}
 
-	protected function resultingType(NumericNode $node, NumericNode $other): int {
-		return max($this->orderType($node), $this->orderType($other));
+	protected function resultingType(NumericNode $node, NumericNode $other): NodeOrder {
+		return NodeOrder::from(max($this->orderType($node)->value, $this->orderType($other)->value));
 	}
 }

@@ -12,15 +12,15 @@ declare(strict_types=1);
 namespace MathParser\Parsing\Nodes;
 
 use MathParser\Exceptions\UnknownOperatorException;
-use MathParser\Interpreting\Visitors\Visitor;
+use MathParser\Interpreting\Visitors\VisitorInterface;
 use MathParser\Parsing\Associativity;
-use MathParser\Parsing\Nodes\Traits\Sanitize;
+use MathParser\Parsing\Nodes\Traits\SanitizeTrait;
 
 /**
  * AST node representing a binary operator
  */
 class ExpressionNode extends Node {
-	use Sanitize;
+	use SanitizeTrait;
 
 	/** Left operand */
 	private ?Node $left=null;
@@ -100,12 +100,8 @@ class ExpressionNode extends Node {
 		}
 	}
 
-	/**
-	 * Return the first (left) operand.
-	 *
-	 * @return Node|null
-	 */
-	public function getLeft() {
+	/** Return the first (left) operand. */
+	public function getLeft(): ?Node {
 		return $this->left;
 	}
 
@@ -134,27 +130,21 @@ class ExpressionNode extends Node {
 		$this->right = $operand;
 	}
 
-	/**
-	 * Return the precedence of the ExpressionNode.
-	 *
-	 * @return int precedence
-	 */
-	public function getPrecedence() {
+	/** Return the precedence of the ExpressionNode. */
+	public function getPrecedence(): int {
 		return $this->precedence;
 	}
 
 	/** Implementing the Visitable interface. */
-	public function accept(Visitor $visitor): mixed {
+	public function accept(VisitorInterface $visitor): mixed {
 		return $visitor->visitExpressionNode($this);
 	}
 
 	/**
 	 * Returns true if the node can represent a unary operator, i.e. if
 	 * the operator is '+' or '-'-
-	 *
-	 * @return bool
 	 */
-	public function canBeUnary() {
+	public function canBeUnary(): bool {
 		return in_array($this->operator, ['+', '-', '~'], true);
 	}
 

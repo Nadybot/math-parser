@@ -11,19 +11,19 @@ declare(strict_types=1);
 
 namespace MathParser\Parsing\Nodes\Factories;
 
-use MathParser\Parsing\Nodes\Interfaces\ExpressionNodeFactory;
+use MathParser\Parsing\Nodes\Interfaces\ExpressionNodeFactoryInterface;
 
-use MathParser\Parsing\Nodes\Traits\{Numeric, Sanitize};
-use MathParser\Parsing\Nodes\{ExpressionNode, IntegerNode, Node, NumberNode, NumericNode, RationalNode};
+use MathParser\Parsing\Nodes\Traits\{NumericTrait, SanitizeTrait};
+use MathParser\Parsing\Nodes\{ExpressionNode, IntegerNode, Node, NodeOrder, NumberNode, NumericNode, RationalNode};
 
 /**
  * Factory for creating an ExpressionNode representing '*'.
  *
  * Some basic simplification is applied to the resulting Node.
  */
-class MultiplicationNodeFactory implements ExpressionNodeFactory {
-	use Sanitize;
-	use Numeric;
+class MultiplicationNodeFactory implements ExpressionNodeFactoryInterface {
+	use SanitizeTrait;
+	use NumericTrait;
 
 	/**
 	 * Create a Node representing 'leftOperand * rightOperand'
@@ -78,17 +78,17 @@ class MultiplicationNodeFactory implements ExpressionNodeFactory {
 		$type = $this->resultingType($leftOperand, $rightOperand);
 
 		switch ($type) {
-			case Node::NUMERIC_FLOAT:
+			case NodeOrder::Float:
 				return new NumberNode($leftOperand->getValue() * $rightOperand->getValue());
 
-			case Node::NUMERIC_RATIONAL:
+			case NodeOrder::Rational:
 				assert($leftOperand instanceof RationalNode);
 				assert($rightOperand instanceof RationalNode);
 				$p = $leftOperand->getNumerator() * $rightOperand->getNumerator();
 				$q = $leftOperand->getDenominator() * $rightOperand->getDenominator();
 				return new RationalNode($p, $q);
 
-			case Node::NUMERIC_INTEGER:
+			case NodeOrder::Integer:
 				assert($leftOperand instanceof IntegerNode);
 				assert($rightOperand instanceof IntegerNode);
 				return new IntegerNode($leftOperand->getValue() * $rightOperand->getValue());

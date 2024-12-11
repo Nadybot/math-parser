@@ -11,7 +11,7 @@ namespace MathParser\Interpreting;
 
 use MathParser\Exceptions\{DivisionByZeroException, UnknownConstantException, UnknownFunctionException, UnknownOperatorException, UnknownVariableException};
 use MathParser\Extensions\{Math, Rational};
-use MathParser\Interpreting\Visitors\Visitor;
+use MathParser\Interpreting\Visitors\VisitorInterface;
 use MathParser\Parsing\Nodes\{ConstantNode, ExpressionNode, FunctionNode, IntegerNode, NumberNode, RationalNode, VariableNode};
 
 /**
@@ -35,9 +35,9 @@ use MathParser\Parsing\Nodes\{ConstantNode, ExpressionNode, FunctionNode, Intege
  * Note that rational variable values should be specified as a string.
  * ```
  *
- * TODO: handle user specified functions
+ * @TODO: handle user specified functions
  */
-class RationalEvaluator implements Visitor {
+class RationalEvaluator implements VisitorInterface {
 	/**
 	 * Key/value pair holding current values
 	 * of the variables used for evaluating.
@@ -54,7 +54,7 @@ class RationalEvaluator implements Visitor {
 	private static array $sieve = [];
 
 	/**
-	 * Constructor. Create an Evaluator with given variable values.
+	 * Create an Evaluator with given variable values.
 	 *
 	 * @param array<string,RationalNode|string|int|float> $variables key-value array of variables with corresponding values.
 	 */

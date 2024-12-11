@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace MathParser\Parsing\Nodes;
 
-use MathParser\Interpreting\Visitors\Visitor;
+use MathParser\Interpreting\Visitors\VisitorInterface;
 
 /**
  * AST node representing a known constant (e.g. pi, e)
@@ -39,7 +39,7 @@ class ConstantNode extends Node {
 	}
 
 	/** Implementing the Visitable interface. */
-	public function accept(Visitor $visitor): mixed {
+	public function accept(VisitorInterface $visitor): mixed {
 		return $visitor->visitConstantNode($this);
 	}
 

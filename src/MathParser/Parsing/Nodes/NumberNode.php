@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace MathParser\Parsing\Nodes;
 
-use MathParser\Interpreting\Visitors\Visitor;
+use MathParser\Interpreting\Visitors\VisitorInterface;
 
 /**
  * AST node representing a number (int or float)
@@ -20,7 +20,7 @@ class NumberNode extends NumericNode {
 	/** The value of the represented number. */
 	private int|float $value;
 
-	/** Constructor. Create a NumberNode with given value. */
+	/** Create a NumberNode with given value. */
 	public function __construct(int|float $value) {
 		$this->value = $value;
 	}
@@ -31,7 +31,7 @@ class NumberNode extends NumericNode {
 	}
 
 	/** Implementing the Visitable interface. */
-	public function accept(Visitor $visitor): mixed {
+	public function accept(VisitorInterface $visitor): mixed {
 		return $visitor->visitNumberNode($this);
 	}
 

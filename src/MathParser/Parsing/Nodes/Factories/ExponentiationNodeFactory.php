@@ -13,18 +13,18 @@ namespace MathParser\Parsing\Nodes\Factories;
 
 use MathParser\Exceptions\DivisionByZeroException;
 
-use MathParser\Parsing\Nodes\Interfaces\ExpressionNodeFactory;
-use MathParser\Parsing\Nodes\Traits\{Numeric, Sanitize};
-use MathParser\Parsing\Nodes\{ExpressionNode, IntegerNode, Node, NumberNode, NumericNode};
+use MathParser\Parsing\Nodes\Interfaces\ExpressionNodeFactoryInterface;
+use MathParser\Parsing\Nodes\Traits\{NumericTrait, SanitizeTrait};
+use MathParser\Parsing\Nodes\{ExpressionNode, IntegerNode, Node, NodeOrder, NumberNode, NumericNode};
 
 /**
  * Factory for creating an ExpressionNode representing '^'.
  *
  * Some basic simplification is applied to the resulting Node.
  */
-class ExponentiationNodeFactory implements ExpressionNodeFactory {
-	use Sanitize;
-	use Numeric;
+class ExponentiationNodeFactory implements ExpressionNodeFactoryInterface {
+	use SanitizeTrait;
+	use NumericTrait;
 
 	/**
 	 * Create a Node representing '$leftOperand^$rightOperand'
@@ -88,10 +88,10 @@ class ExponentiationNodeFactory implements ExpressionNodeFactory {
 
 		// Compute x^y if both are numbers.
 		switch ($type) {
-			case Node::NUMERIC_FLOAT:
+			case NodeOrder::Float:
 				return new NumberNode(pow($leftOperand->getValue(), $rightOperand->getValue()));
 
-			case Node::NUMERIC_INTEGER:
+			case NodeOrder::Integer:
 				assert($leftOperand instanceof IntegerNode);
 				assert($rightOperand instanceof IntegerNode);
 				if ($rightOperand->getValue() > 0) {

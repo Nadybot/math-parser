@@ -44,7 +44,7 @@ class Complex {
 
 	/** string representation of a complex number */
 	public function __toString(): string {
-		// TODO: use Number:: helper functions.
+		// @TODO: use Number:: helper functions.
 
 		$realAsRational = Rational::fromFloat($this->x);
 		if ($realAsRational->q <= 100) {

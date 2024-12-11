@@ -201,7 +201,7 @@ class Rational {
 		if ($float === 0.0) {
 			return new Rational(0, 1);
 		}
-		$negative = ($float < 0);
+		$negative = $float < 0;
 		if ($negative) {
 			$float = abs($float);
 		}

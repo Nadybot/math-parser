@@ -94,8 +94,7 @@ class Token {
 			return false;
 		}
 
-		$check1 = (
-			$token1->type === TokenType::PosInt
+		$check1 = $token1->type === TokenType::PosInt
 			|| $token1->type === TokenType::Integer
 			|| $token1->type === TokenType::RealNumber
 			|| $token1->type === TokenType::Constant
@@ -103,22 +102,19 @@ class Token {
 			|| $token1->type === TokenType::FunctionName
 			|| $token1->type === TokenType::CloseParenthesis
 			|| $token1->type === TokenType::FactorialOperator
-			|| $token1->type === TokenType::SemiFactorialOperator
-		);
+			|| $token1->type === TokenType::SemiFactorialOperator;
 
 		if (!$check1) {
 			return false;
 		}
 
-		$check2 = (
-			$token2->type === TokenType::PosInt
+		$check2 = $token2->type === TokenType::PosInt
 			|| $token2->type === TokenType::Integer
 			|| $token2->type === TokenType::RealNumber
 			|| $token2->type === TokenType::Constant
 			|| $token2->type === TokenType::Identifier
 			|| $token2->type === TokenType::FunctionName
-			|| $token2->type === TokenType::OpenParenthesis
-		);
+			|| $token2->type === TokenType::OpenParenthesis;
 
 		if (!$check2) {
 			return false;

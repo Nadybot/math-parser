@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace MathParser\Interpreting;
 
 use MathParser\Exceptions\{UnknownConstantException, UnknownOperatorException};
-use MathParser\Interpreting\Visitors\Visitor;
+use MathParser\Interpreting\Visitors\VisitorInterface;
 use MathParser\Parsing\Nodes\{ConstantNode, ExpressionNode, FunctionNode, IntegerNode, Node, NumberNode, NumericNode, RationalNode, VariableNode};
 
 /**
@@ -34,7 +34,7 @@ use MathParser\Parsing\Nodes\{ConstantNode, ExpressionNode, FunctionNode, Intege
  * Note that surrounding `$`, `$$` or `\begin{equation}..\end{equation}`
  * has to be added manually.
  */
-class LaTeXPrinter implements Visitor {
+class LaTeXPrinter implements VisitorInterface {
 	/**
 	 * Flag to determine if division should be typeset
 	 * with a solidus, e.g. x/y or a proper fraction \frac{x}{y}

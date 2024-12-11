@@ -11,7 +11,7 @@ namespace MathParser\Interpreting;
 
 use MathParser\Exceptions\{UnknownConstantException, UnknownFunctionException, UnknownOperatorException, UnknownVariableException};
 use MathParser\Extensions\{Complex, Rational};
-use MathParser\Interpreting\Visitors\Visitor;
+use MathParser\Interpreting\Visitors\VisitorInterface;
 use MathParser\Lexer\StdMathLexer;
 use MathParser\Parsing\Nodes\{ConstantNode, ExpressionNode, FunctionNode, IntegerNode, NumberNode, RationalNode, VariableNode};
 
@@ -36,9 +36,9 @@ use MathParser\Parsing\Nodes\{ConstantNode, ExpressionNode, FunctionNode, Intege
  * Note that rational variable values should be specified as a string.
  * ```
  *
- * TODO: handle user specified functions
+ * @TODO: handle user specified functions
  */
-class ComplexEvaluator implements Visitor {
+class ComplexEvaluator implements VisitorInterface {
 	/**
 	 * Variables Key/value pair holding current values
 	 * of the variables used for evaluating.
@@ -48,7 +48,7 @@ class ComplexEvaluator implements Visitor {
 	private array $variables;
 
 	/**
-	 * Constructor. Create an Evaluator with given variable values.
+	 * Create an Evaluator with given variable values.
 	 *
 	 * @param array<string,Complex|Rational|int|float|string> $variables key-value array of variables with corresponding values.
 	 */

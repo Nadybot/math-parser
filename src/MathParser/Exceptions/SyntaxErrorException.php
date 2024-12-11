@@ -15,7 +15,7 @@ namespace MathParser\Exceptions;
  * Exception thrown when parsing expressions that are not well-formed.
  */
 class SyntaxErrorException extends MathParserException {
-	/** Constructor. Create a SyntaxErrorException */
+	/** Create a SyntaxErrorException */
 	public function __construct() {
 		parent::__construct('Syntax error.');
 	}

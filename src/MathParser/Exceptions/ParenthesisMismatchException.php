@@ -16,7 +16,7 @@ namespace MathParser\Exceptions;
  * right parentheses.
  */
 class ParenthesisMismatchException extends MathParserException {
-	/** Constructor. Create a ParenthesisMismatchException */
+	/** Create a ParenthesisMismatchException */
 	public function __construct(string $data='') {
 		parent::__construct('Unable to match delimiters.');
 

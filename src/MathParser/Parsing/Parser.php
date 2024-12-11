@@ -205,7 +205,7 @@ class Parser {
 	 * @return list<Token>
 	 */
 	protected function filterTokens(array $tokens): array {
-		$filteredTokens = array_filter($tokens, static function (Token $t) {
+		$filteredTokens = array_filter($tokens, static function (Token $t): bool {
 			return $t->getType() !== TokenType::Whitespace;
 		});
 
@@ -287,7 +287,8 @@ class Parser {
 		return $lastNode instanceof ExpressionNode && $lastNode->getOperator() === '~';
 	}
 
-	/** Handle a closing parenthesis, popping operators off the
+	/**
+	 * Handle a closing parenthesis, popping operators off the
 	 * operator stack until we find a matching opening parenthesis.
 	 *
 	 * @throws ParenthesisMismatchException

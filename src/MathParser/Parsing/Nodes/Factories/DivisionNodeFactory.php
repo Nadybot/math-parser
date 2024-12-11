@@ -13,18 +13,18 @@ namespace MathParser\Parsing\Nodes\Factories;
 
 use MathParser\Exceptions\DivisionByZeroException;
 
-use MathParser\Parsing\Nodes\Interfaces\ExpressionNodeFactory;
-use MathParser\Parsing\Nodes\Traits\{Numeric, Sanitize};
-use MathParser\Parsing\Nodes\{ExpressionNode, IntegerNode, Node, NumberNode, NumericNode, RationalNode};
+use MathParser\Parsing\Nodes\Interfaces\ExpressionNodeFactoryInterface;
+use MathParser\Parsing\Nodes\Traits\{NumericTrait, SanitizeTrait};
+use MathParser\Parsing\Nodes\{ExpressionNode, IntegerNode, Node, NodeOrder, NumberNode, NumericNode, RationalNode};
 
 /**
  * Factory for creating an ExpressionNode representing '/'.
  *
  * Some basic simplification is applied to the resulting Node.
  */
-class DivisionNodeFactory implements ExpressionNodeFactory {
-	use Sanitize;
-	use Numeric;
+class DivisionNodeFactory implements ExpressionNodeFactoryInterface {
+	use SanitizeTrait;
+	use NumericTrait;
 
 	/**
 	 * Create a Node representing '$leftOperand/$rightOperand'
@@ -80,11 +80,11 @@ class DivisionNodeFactory implements ExpressionNodeFactory {
 		$type = $this->resultingType($leftOperand, $rightOperand);
 
 		switch ($type) {
-			case Node::NUMERIC_FLOAT:
+			case NodeOrder::Float:
 				return new NumberNode($leftOperand->getValue() / $rightOperand->getValue());
 
-			case Node::NUMERIC_RATIONAL:
-			case Node::NUMERIC_INTEGER:
+			case NodeOrder::Rational:
+			case NodeOrder::Integer:
 				assert($leftOperand instanceof IntegerNode || $leftOperand instanceof RationalNode);
 				assert($rightOperand instanceof IntegerNode || $rightOperand instanceof RationalNode);
 				$p = $leftOperand->getNumerator() * $rightOperand->getDenominator();

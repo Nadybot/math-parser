@@ -15,7 +15,7 @@ declare(strict_types=1);
 namespace MathParser\Interpreting;
 
 use MathParser\Exceptions\{UnknownFunctionException, UnknownOperatorException};
-use MathParser\Interpreting\Visitors\Visitor;
+use MathParser\Interpreting\Visitors\VisitorInterface;
 use MathParser\Parsing\Nodes\Factories\NodeFactory;
 use MathParser\Parsing\Nodes\{ConstantNode, ExpressionNode, FunctionNode, IntegerNode, Node, NumberNode, RationalNode, VariableNode};
 
@@ -42,9 +42,9 @@ use MathParser\Parsing\Nodes\{ConstantNode, ExpressionNode, FunctionNode, Intege
  * $df = $f->accept($ddx);             // $df now contains the AST of '2exp(2x)+y'
  * ```
  *
- * TODO: handle user specified functions
+ * @TODO: handle user specified functions
  */
-class Differentiator implements Visitor {
+class Differentiator implements VisitorInterface {
 	/** Variable that we differentiate with respect to */
 	protected string $variable;
 

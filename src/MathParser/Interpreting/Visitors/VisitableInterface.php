@@ -14,7 +14,7 @@ declare(strict_types=1);
  *
  */
 
-/** @namespace MathParser::Interpreting::Visitors
+/**
  * Interfaces required to implement the visitor design pattern.
  *
  * Two interfaces are required:
@@ -43,7 +43,7 @@ namespace MathParser\Interpreting\Visitors;
  * $node->accept();
  * ```
  */
-interface Visitable {
+interface VisitableInterface {
 	/**
 	 * Single function in the Visitable interface
 	 *
@@ -51,5 +51,5 @@ interface Visitable {
 	 * i.e. a Node (or subclass thereof) causes the supplied
 	 * Visitor to traverse the AST.
 	 */
-	public function accept(Visitor $visitor): mixed;
+	public function accept(VisitorInterface $visitor): mixed;
 }

@@ -16,7 +16,7 @@ namespace MathParser\Exceptions;
  * unknown or undefined variable.
  */
 class UnknownVariableException extends MathParserException {
-	/** Constructor. Create a UnknownVariableException */
+	/** Create a UnknownVariableException */
 	public function __construct(string $variable) {
 		parent::__construct("Unknown variable {$variable}.");
 

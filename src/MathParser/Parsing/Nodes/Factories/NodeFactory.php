@@ -9,12 +9,6 @@ declare(strict_types=1);
 *
 */
 
-/** @namespace MathParser::Parsing::Nodes::Factories
- *
- * Classes implementing the ExpressionNodeFactory interfaces,
- * and related functionality.
- */
-
 namespace MathParser\Parsing\Nodes\Factories;
 
 use MathParser\Exceptions\UnknownOperatorException;

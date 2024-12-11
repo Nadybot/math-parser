@@ -15,7 +15,7 @@ namespace MathParser\Exceptions;
  * Exception thrown when evaluating expressions containing a division by zero.
  */
 class DivisionByZeroException extends MathParserException {
-	/** Constructor. Create a DivisionByZeroException */
+	/** Create a DivisionByZeroException */
 	public function __construct() {
 		parent::__construct('Division by zero.');
 	}

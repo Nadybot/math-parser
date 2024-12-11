@@ -11,7 +11,7 @@ namespace MathParser\Interpreting;
 
 use MathParser\Exceptions\{DivisionByZeroException, UnknownConstantException, UnknownFunctionException, UnknownOperatorException, UnknownVariableException};
 use MathParser\Extensions\Math;
-use MathParser\Interpreting\Visitors\Visitor;
+use MathParser\Interpreting\Visitors\VisitorInterface;
 use MathParser\Parsing\Nodes\{ConstantNode, ExpressionNode, FunctionNode, IntegerNode, NumberNode, RationalNode, VariableNode};
 
 /**
@@ -34,9 +34,9 @@ use MathParser\Parsing\Nodes\{ConstantNode, ExpressionNode, FunctionNode, Intege
  * result = $f->accept($evaluator);    // Evaluate $f using x=1, y=-1
  * ```
  *
- * TODO: handle user specified functions
+ * @TODO: handle user specified functions
  */
-class Evaluator implements Visitor {
+class Evaluator implements VisitorInterface {
 	/**
 	 * Key/value pair holding current values of the variables used for evaluating.
 	 *
@@ -45,12 +45,12 @@ class Evaluator implements Visitor {
 	private array $variables;
 
 	/**
-	 * Constructor. Create an Evaluator with given variable values.
+	 * Create an Evaluator with given variable values.
 	 *
 	 * @param array<string,mixed> $variables key-value array of variables with corresponding values.
 	 */
-	public function __construct($variables=[]) {
-		$this->variables = $variables;
+	public function __construct(array $variables=[]) {
+		$this->setVariables($variables);
 	}
 
 	/**
@@ -58,7 +58,7 @@ class Evaluator implements Visitor {
 	 *
 	 * @param array<string,mixed> $variables Key/value pair holding current variable values
 	 */
-	public function setVariables($variables): void {
+	public function setVariables(array $variables): void {
 		$this->variables = $variables;
 	}
 

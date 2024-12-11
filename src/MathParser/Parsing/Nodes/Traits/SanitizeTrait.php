@@ -9,11 +9,6 @@ declare(strict_types=1);
 *
 */
 
-/** @namespace MathParser::Parsing::Nodes::Traits
- *
- * Traits for Nodes
- */
-
 namespace MathParser\Parsing\Nodes\Traits;
 
 use MathParser\Parsing\Nodes\{IntegerNode, Node, NumberNode};
@@ -23,7 +18,7 @@ use MathParser\Parsing\Nodes\{IntegerNode, Node, NumberNode};
  * making it possible to call the Node constructors directly
  * with numbers, making the code cleaner.
  */
-trait Sanitize {
+trait SanitizeTrait {
 	/** Convert ints and floats to NumberNodes */
 	protected function sanitize(null|Node|int|float $operand): ?Node {
 		if (is_int($operand)) {

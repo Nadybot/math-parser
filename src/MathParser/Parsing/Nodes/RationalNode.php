@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace MathParser\Parsing\Nodes;
 
 use MathParser\Exceptions\DivisionByZeroException;
-use MathParser\Interpreting\Visitors\Visitor;
+use MathParser\Interpreting\Visitors\VisitorInterface;
 
 /**
  * AST node representing a number (int or float)
@@ -24,7 +24,7 @@ class RationalNode extends NumericNode {
 	/** The denominator of the represented number. */
 	private float $q;
 
-	/** Constructor. Create a RationalNode with given value. */
+	/** Create a RationalNode with given value. */
 	public function __construct(float $p, float $q, bool $normalize=true) {
 		if ($q === -0.0 || $q === 0.0) {
 			throw new DivisionByZeroException();
@@ -52,7 +52,7 @@ class RationalNode extends NumericNode {
 	}
 
 	/** Implementing the Visitable interface. */
-	public function accept(Visitor $visitor): mixed {
+	public function accept(VisitorInterface $visitor): mixed {
 		return $visitor->visitRationalNode($this);
 	}
 

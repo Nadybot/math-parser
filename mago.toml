@@ -1,0 +1,19 @@
+[source]
+paths = ["src"]
+includes = []
+excludes = []
+
+[linter]
+level = "Error"
+
+[[linter.rules]]
+name = "naming/class"
+psr = false
+
+[[linter.rules]]
+name = "strictness/no-assignment-in-condition"
+level = "Off"
+
+[[linter.rules]]
+name = "comment/docblock-syntax"
+level = "Note"

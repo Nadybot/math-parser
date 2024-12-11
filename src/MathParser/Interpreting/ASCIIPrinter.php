@@ -10,7 +10,7 @@ declare(strict_types=1);
 namespace MathParser\Interpreting;
 
 use MathParser\Exceptions\{UnknownConstantException, UnknownOperatorException};
-use MathParser\Interpreting\Visitors\Visitor;
+use MathParser\Interpreting\Visitors\VisitorInterface;
 use MathParser\Parsing\Nodes\{ConstantNode, ExpressionNode, FunctionNode, IntegerNode, Node, NumberNode, RationalNode, VariableNode};
 
 /**
@@ -34,7 +34,7 @@ use MathParser\Parsing\Nodes\{ConstantNode, ExpressionNode, FunctionNode, Intege
  * Note that surrounding `$`, `$$` or `\begin{equation}..\end{equation}`
  * has to be added manually.
  */
-class ASCIIPrinter implements Visitor {
+class ASCIIPrinter implements VisitorInterface {
 	/**
 	 * Generate ASCII output code for an ExpressionNode
 	 *
