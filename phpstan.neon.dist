@@ -1,0 +1,26 @@
+parameters:
+  reportMaybesInPropertyPhpDocTypes: false
+  level: 7
+  paths:
+    - src
+  phpVersion: 80200
+  strictRules:
+    allRules: false
+    disallowedLooseComparison: true
+    booleansInConditions: false
+    uselessCast: true
+    requireParentConstructorCall: false
+    disallowedConstructs: true
+    overwriteVariablesWithLoop: true
+    closureUsesThis: true
+    matchingInheritedMethodNames: true
+    numericOperandsInArithmeticOperators: true
+    strictCalls: true
+    switchConditionsMatchingType: true
+    noVariableVariables: false
+    strictArrayFilter: true
+includes:
+    - phar://phpstan.phar/conf/bleedingEdge.neon
+    - vendor/phpstan/phpstan-deprecation-rules/rules.neon
+    - vendor/phpstan/phpstan-strict-rules/rules.neon
+#    - vendor/thecodingmachine/phpstan-safe-rule/phpstan-safe-rule.neon

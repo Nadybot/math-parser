@@ -16,56 +16,45 @@ use MathParser\Interpreting\Visitors\Visitor;
 /**
  * AST node representing a number (int or float)
  */
-class IntegerNode extends NumericNode
-{
-    /** The value of the represented number. */
-    private int $value;
+class IntegerNode extends NumericNode {
+	/** The value of the represented number. */
+	private int $value;
 
-    /** Constructor. Create a NumberNode with given value. */
-    public function __construct(int $value)
-    {
-        $this->value = $value;
-    }
+	/** Constructor. Create a NumberNode with given value. */
+	public function __construct(int $value) {
+		$this->value = $value;
+	}
 
-    /**
-     * Returns the value
-     */
-    public function getValue(): int
-    {
-        return $this->value;
-    }
+	/** Returns the value */
+	public function getValue(): int {
+		return $this->value;
+	}
 
-    public function getNumerator(): int
-    {
-        return $this->value;
-    }
+	public function getNumerator(): int {
+		return $this->value;
+	}
 
-    public function getDenominator(): int
-    {
-        return 1;
-    }
+	public function getDenominator(): int {
+		return 1;
+	}
 
-    /**
-     * Implementing the Visitable interface.
-     */
-    public function accept(Visitor $visitor): mixed
-    {
-        return $visitor->visitIntegerNode($this);
-    }
+	/** Implementing the Visitable interface. */
+	public function accept(Visitor $visitor): mixed {
+		return $visitor->visitIntegerNode($this);
+	}
 
-    /** Implementing the compareTo abstract method. */
-    public function compareTo(?Node $other): bool
-    {
-        if ($other === null) {
-            return false;
-        }
-        if ($other instanceof RationalNode) {
-            return $other->getDenominator() == 1 && $this->getValue() == $other->getNumerator();
-        }
-        if (!($other instanceof IntegerNode)) {
-            return false;
-        }
+	/** Implementing the compareTo abstract method. */
+	public function compareTo(?Node $other): bool {
+		if ($other === null) {
+			return false;
+		}
+		if ($other instanceof RationalNode) {
+			return $other->getDenominator() === 1.0 && (float)$this->getValue() === $other->getNumerator();
+		}
+		if (!($other instanceof IntegerNode)) {
+			return false;
+		}
 
-        return $this->getValue() === $other->getValue();
-    }
+		return $this->getValue() === $other->getValue();
+	}
 }

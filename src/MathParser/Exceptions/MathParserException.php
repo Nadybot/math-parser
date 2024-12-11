@@ -10,26 +10,22 @@ declare(strict_types=1);
  */
 
 /**
-  * @namespace MathParser::Exceptions
-  *
-  * Exceptions thrown by the MathParser library.
-  */
+ * @namespace MathParser::Exceptions
+ *
+ * Exceptions thrown by the MathParser library.
+ */
 
 namespace MathParser\Exceptions;
 
 /**
  * Base class for the exceptions thrown by the MathParser library.
  */
-abstract class MathParserException extends \Exception
-{
-    /** Additional information about the exception. */
-    protected string $data;
+abstract class MathParserException extends \Exception {
+	/** Additional information about the exception. */
+	protected string $data;
 
-    /**
-     * Get additional information about the exception.
-     */
-    public function getData(): string
-    {
-        return $this->data;
-    }
+	/** Get additional information about the exception. */
+	public function getData(): string {
+		return $this->data;
+	}
 }

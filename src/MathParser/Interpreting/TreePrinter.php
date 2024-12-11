@@ -10,13 +10,7 @@ declare(strict_types=1);
 namespace MathParser\Interpreting;
 
 use MathParser\Interpreting\Visitors\Visitor;
-use MathParser\Parsing\Nodes\ExpressionNode;
-use MathParser\Parsing\Nodes\NumberNode;
-use MathParser\Parsing\Nodes\VariableNode;
-use MathParser\Parsing\Nodes\FunctionNode;
-use MathParser\Parsing\Nodes\ConstantNode;
-use MathParser\Parsing\Nodes\IntegerNode;
-use MathParser\Parsing\Nodes\RationalNode;
+use MathParser\Parsing\Nodes\{ConstantNode, ExpressionNode, FunctionNode, IntegerNode, NumberNode, RationalNode, VariableNode};
 
 /**
  * Simple string representation of an AST. Probably most
@@ -27,86 +21,66 @@ use MathParser\Parsing\Nodes\RationalNode;
  *
  * ## Example:
  *
- * ~~~{.php}
+ * ```php
  * $parser = new StdMathParser();
  * $f = $parser->parse('exp(2x)+xy');
  * printer = new TreePrinter();
  * result = $f->accept($printer);    // Generates "(+ (exp (* 2 x)) (* x y))"
- * ~~~
+ * ```
  */
-class TreePrinter implements Visitor
-{
-    /**
-     * Print an ExpressionNode.
-     */
-    public function visitExpressionNode(ExpressionNode $node): string
-    {
-        $leftValue = $node->getLeft()->accept($this);
-        $operator = $node->getOperator();
+class TreePrinter implements Visitor {
+	/** Print an ExpressionNode. */
+	public function visitExpressionNode(ExpressionNode $node): string {
+		$leftValue = $node->getLeft()->accept($this);
+		$operator = $node->getOperator();
 
-        // The operator and the right side are optional, remember?
-        if (!$operator) {
-            return "$leftValue";
-        }
+		// The operator and the right side are optional, remember?
+		if (!$operator) {
+			return "{$leftValue}";
+		}
 
-        $right = $node->getRight();
+		$right = $node->getRight();
 
-        if ($right) {
-            $rightValue = $node->getRight()->accept($this);
-            return "($operator, $leftValue, $rightValue)";
-        } else {
-            return "($operator, $leftValue)";
-        }
-    }
+		if ($right) {
+			$rightValue = $node->getRight()->accept($this);
+			return "({$operator}, {$leftValue}, {$rightValue})";
+		}
+			return "({$operator}, {$leftValue})";
 
-    /**
-     * Print a NumberNode.
-     */
-    public function visitNumberNode(NumberNode $node): string
-    {
-        $val = $node->getValue();
-        return "$val:float";
-    }
-    public function visitIntegerNode(IntegerNode $node): string
-    {
-        $val = $node->getValue();
-        return "$val:int";
-    }
-    public function visitRationalNode(RationalNode $node): string
-    {
-        $p = $node->getNumerator();
-        $q = $node->getDenominator();
-        return "$p/$q:rational";
-    }
+	}
 
-    /**
-     * Print a VariableNode.
-     */
-    public function visitVariableNode(VariableNode $node): string
-    {
-        return $node->getName();
-    }
+	/** Print a NumberNode. */
+	public function visitNumberNode(NumberNode $node): string {
+		$val = $node->getValue();
+		return "{$val}:float";
+	}
 
-    /**
-     * Print a FunctionNode.
-     *
-     * @param FunctionNode $node
-     */
-    public function visitFunctionNode(FunctionNode $node): string
-    {
-        $functionName = $node->getName();
-        $operand = $node->getOperand()->accept($this);
+	public function visitIntegerNode(IntegerNode $node): string {
+		$val = $node->getValue();
+		return "{$val}:int";
+	}
 
-        return "$functionName($operand)";
-    }
+	public function visitRationalNode(RationalNode $node): string {
+		$p = $node->getNumerator();
+		$q = $node->getDenominator();
+		return "{$p}/{$q}:rational";
+	}
 
-    /**
-     * Print a ConstantNode.
-     *
-     * @param ConstantNode $node
-     */
-    public function visitConstantNode(ConstantNode $node): string
-    {
-        return $node->getName();
-    }
+	/** Print a VariableNode. */
+	public function visitVariableNode(VariableNode $node): string {
+		return $node->getName();
+	}
+
+	/** Print a FunctionNode. */
+	public function visitFunctionNode(FunctionNode $node): string {
+		$functionName = $node->getName();
+		$operand = $node->getOperand()->accept($this);
+
+		return "{$functionName}({$operand})";
+	}
+
+	/** Print a ConstantNode. */
+	public function visitConstantNode(ConstantNode $node): string {
+		return $node->getName();
+	}
 }

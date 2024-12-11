@@ -18,42 +18,34 @@ use MathParser\Interpreting\Visitors\Visitor;
  * use in the parser. The node will be converted to a FunctionNode
  * when consumed by the parser.
  */
-class PostfixOperatorNode extends Node
-{
-    /** Name of the postfix operator. Currently, only '!' is possible. */
-    private string $name;
+class PostfixOperatorNode extends Node {
+	/** Name of the postfix operator. Currently, only '!' is possible. */
+	private string $name;
 
-    /** Constructor. Create a PostfixOperatorNode with given value. */
-    public function __construct(string $name)
-    {
-        $this->name = $name;
-    }
+	/** Constructor. Create a PostfixOperatorNode with given value. */
+	public function __construct(string $name) {
+		$this->name = $name;
+	}
 
+	/** returns the name of the postfix operator */
+	public function getOperator(): string {
+		return $this->name;
+	}
 
-    /** returns the name of the postfix operator */
-    public function getOperator(): string
-    {
-        return $this->name;
-    }
+	/** Implementing the Visitable interface. */
+	public function accept(Visitor $visitor): mixed {
+		return null;
+	}
 
-    /**
-     * Implementing the Visitable interface.
-     */
-    public function accept(Visitor $visitor): mixed
-    {
-        return null;
-    }
+	/** Implementing the compareTo abstract method. */
+	public function compareTo(?Node $other): bool {
+		if ($other === null) {
+			return false;
+		}
+		if (!($other instanceof PostfixOperatorNode)) {
+			return false;
+		}
 
-    /** Implementing the compareTo abstract method. */
-    public function compareTo(?Node $other): bool
-    {
-        if ($other === null) {
-            return false;
-        }
-        if (!($other instanceof PostfixOperatorNode)) {
-            return false;
-        }
-
-        return $this->getOperator() == $other->getOperator();
-    }
+		return $this->getOperator() === $other->getOperator();
+	}
 }

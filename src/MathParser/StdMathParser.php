@@ -17,7 +17,7 @@ use MathParser\Parsing\Parser;
  *
  * ### Example usage:
  *
- * ~~~{.php}
+ * ```php
  * use MathParser\StdMathParser;
  * use MathParser\Interpreting\Evaluator;
  * use MathParser\Interpreting\Differentiator;
@@ -34,27 +34,23 @@ use MathParser\Parsing\Parser;
  * $d_dx = new Differentiator('x');
  * $derivative = $AST->accept($d_dx);
  * $valueOfDerivative = $derivative->accept($evaluator);
- * ~~~
- *
+ * ```
  */
-class StdMathParser extends AbstractMathParser
-{
-    public function __construct(
-    ) {
-        $this->lexer = new StdMathLexer();
-        $this->parser = new Parser();
-    }
+class StdMathParser extends AbstractMathParser {
+	public function __construct() {
+		$this->lexer = new StdMathLexer();
+		$this->parser = new Parser();
+	}
 
-    /**
-     * Parse the given mathematical expression into an abstract syntax tree.
-     *
-     * @param string $text Input
-     */
-    public function parse(string $text): Node
-    {
-        $this->tokens = $this->lexer->tokenize($text);
-        $this->tree = $this->parser->parse($this->tokens);
+	/**
+	 * Parse the given mathematical expression into an abstract syntax tree.
+	 *
+	 * @param string $text Input
+	 */
+	public function parse(string $text): Node {
+		$this->tokens = $this->lexer->tokenize($text);
+		$this->tree = $this->parser->parse($this->tokens);
 
-        return $this->tree;
-    }
+		return $this->tree;
+	}
 }

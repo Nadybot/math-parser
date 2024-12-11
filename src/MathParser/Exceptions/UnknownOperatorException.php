@@ -17,21 +17,16 @@ namespace MathParser\Exceptions;
  *
  * This should not happen under normal circumstances.
  */
-class UnknownOperatorException extends MathParserException
-{
-    /** Constructor. Create a UnknownOperatorException */
-    public function __construct(string $operator)
-    {
-        parent::__construct("Unknown operator $operator.");
+class UnknownOperatorException extends MathParserException {
+	/** Constructor. Create a UnknownOperatorException */
+	public function __construct(string $operator) {
+		parent::__construct("Unknown operator {$operator}.");
 
-        $this->data = $operator;
-    }
+		$this->data = $operator;
+	}
 
-    /**
-     * Get the unkown operator that was encountered.
-     */
-    public function getOperator(): string
-    {
-        return $this->data;
-    }
+	/** Get the unkown operator that was encountered. */
+	public function getOperator(): string {
+		return $this->data;
+	}
 }

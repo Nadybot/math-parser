@@ -17,21 +17,16 @@ namespace MathParser\Exceptions;
  *
  * This should not happen under normal circumstances.
  */
-class UnknownConstantException extends MathParserException
-{
-    /** Constructor. Create a UnknownConstantException. */
-    public function __construct(string $operator)
-    {
-        parent::__construct("Unknown constant $operator.");
+class UnknownConstantException extends MathParserException {
+	/** Constructor. Create a UnknownConstantException. */
+	public function __construct(string $operator) {
+		parent::__construct("Unknown constant {$operator}.");
 
-        $this->data = $operator;
-    }
+		$this->data = $operator;
+	}
 
-    /**
-     * Get the unkown constant that was encountered.
-     */
-    public function getConstant(): string
-    {
-        return $this->data;
-    }
+	/** Get the unkown constant that was encountered. */
+	public function getConstant(): string {
+		return $this->data;
+	}
 }

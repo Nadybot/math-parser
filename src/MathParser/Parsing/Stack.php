@@ -13,63 +13,55 @@ namespace MathParser\Parsing;
 
 /**
  * Utility class, implementing a simple FIFO stack
+ *
  * @template TValue
  */
-class Stack
-{
-    /**
-     * internal storage of data on the stack.
-     * @var list<TValue>
-     */
-    protected array $data = [];
+class Stack {
+	/**
+	 * internal storage of data on the stack.
+	 *
+	 * @var list<TValue>
+	 */
+	protected array $data = [];
 
-    /**
-     * Push an element onto the stack.
-     * @param TValue $element
-     */
-    public function push(mixed $element): void
-    {
-        $this->data[] = $element;
-    }
+	public function __toString(): string {
+		return implode(' ; ', $this->data);
+	}
 
-    /**
-     * Return the top element (without popping it)
-     * @return TValue
-     */
-    public function peek(): mixed
-    {
-        return end($this->data);
-    }
+	/**
+	 * Push an element onto the stack.
+	 *
+	 * @param TValue $element
+	 */
+	public function push(mixed $element): void {
+		$this->data[] = $element;
+	}
 
-    /**
-     * Return the top element and remove it from the stack.
-     * @return TValue
-     */
-    public function pop(): mixed
-    {
-        return array_pop($this->data);
-    }
+	/**
+	 * Return the top element (without popping it)
+	 *
+	 * @return TValue|false
+	 */
+	public function peek(): mixed {
+		return end($this->data);
+	}
 
-    /**
-     * Return the current number of elements in the stack.
-     */
-    public function count(): int
-    {
-        return count($this->data);
-    }
+	/**
+	 * Return the top element and remove it from the stack.
+	 *
+	 * @return TValue|null
+	 */
+	public function pop(): mixed {
+		return array_pop($this->data);
+	}
 
-    /**
-     * Returns true if the stack is empty
-     *
-     * @return boolean
-     **/
-    public function isEmpty(): bool
-    {
-        return $this->count() === 0;
-    }
+	/** Return the current number of elements in the stack. */
+	public function count(): int {
+		return count($this->data);
+	}
 
-    public function __toString(): string
-    {
-        return implode(' ; ', $this->data);
-    }
+	/** Returns true if the stack is empty */
+	public function isEmpty(): bool {
+		return $this->count() === 0;
+	}
 }

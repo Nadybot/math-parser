@@ -15,21 +15,16 @@ namespace MathParser\Exceptions;
  * Exception thrown when parsing or evaluating expressions containing an
  * unknown or undefined variable.
  */
-class UnknownVariableException extends MathParserException
-{
-    /** Constructor. Create a UnknownVariableException */
-    public function __construct(string $variable)
-    {
-        parent::__construct("Unknown variable $variable.");
+class UnknownVariableException extends MathParserException {
+	/** Constructor. Create a UnknownVariableException */
+	public function __construct(string $variable) {
+		parent::__construct("Unknown variable {$variable}.");
 
-        $this->data = $variable;
-    }
+		$this->data = $variable;
+	}
 
-    /**
-     * Get the unkown variable.
-     */
-    public function getVariable(): string
-    {
-        return $this->data;
-    }
+	/** Get the unkown variable. */
+	public function getVariable(): string {
+		return $this->data;
+	}
 }

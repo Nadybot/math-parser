@@ -13,125 +13,115 @@ namespace MathParser\Parsing\Nodes\Factories;
 
 use MathParser\Parsing\Nodes\Interfaces\ExpressionNodeFactory;
 
-use MathParser\Parsing\Nodes\Node;
-use MathParser\Parsing\Nodes\NumberNode;
-use MathParser\Parsing\Nodes\IntegerNode;
-use MathParser\Parsing\Nodes\RationalNode;
-
-use MathParser\Parsing\Nodes\ExpressionNode;
-use MathParser\Parsing\Nodes\NumericNode;
-use MathParser\Parsing\Nodes\Traits\Sanitize;
-use MathParser\Parsing\Nodes\Traits\Numeric;
+use MathParser\Parsing\Nodes\Traits\{Numeric, Sanitize};
+use MathParser\Parsing\Nodes\{ExpressionNode, IntegerNode, Node, NumberNode, NumericNode, RationalNode};
 
 /**
  * Factory for creating an ExpressionNode representing '-'.
  *
  * Some basic simplification is applied to the resulting Node.
- *
  */
-class SubtractionNodeFactory implements ExpressionNodeFactory
-{
-    use Sanitize;
-    use Numeric;
+class SubtractionNodeFactory implements ExpressionNodeFactory {
+	use Sanitize;
+	use Numeric;
 
-    /**
-    * Create a Node representing 'leftOperand - rightOperand'
-    *
-    * Using some simplification rules, create a NumberNode or ExpressionNode
-    * giving an AST correctly representing 'rightOperand - leftOperand'.
-    *
-    * ### Simplification rules:
-    *
-    * - To simplify the use of the function, convert integer params to NumberNodes
-    * - If $rightOperand is null, return a unary minus node '-x' instead
-    * - If $leftOperand and $rightOperand are both NumberNodes, return a single NumberNode containing their difference
-    * - If $rightOperand is a NumberNode representing 0, return $leftOperand unchanged
-    * - If $leftOperand and $rightOperand are equal, return '0'
-    *
-    * @param Node|int|float $leftOperand Minuend
-    * @param Node|int|float $rightOperand Subtrahend
-    */
-    public function makeNode(Node|int|float $leftOperand, Node|int|float|null $rightOperand): Node
-    {
-        if ($rightOperand === null) {
-            return $this->createUnaryMinusNode($leftOperand);
-        }
+	/**
+	 * Create a Node representing 'leftOperand - rightOperand'
+	 *
+	 * Using some simplification rules, create a NumberNode or ExpressionNode
+	 * giving an AST correctly representing 'rightOperand - leftOperand'.
+	 *
+	 * ### Simplification rules:
+	 *
+	 * - To simplify the use of the function, convert integer params to NumberNodes
+	 * - If $rightOperand is null, return a unary minus node '-x' instead
+	 * - If $leftOperand and $rightOperand are both NumberNodes, return a single NumberNode containing their difference
+	 * - If $rightOperand is a NumberNode representing 0, return $leftOperand unchanged
+	 * - If $leftOperand and $rightOperand are equal, return '0'
+	 *
+	 * @param Node|int|float $leftOperand  Minuend
+	 * @param Node|int|float $rightOperand Subtrahend
+	 */
+	public function makeNode(Node|int|float $leftOperand, null|Node|int|float $rightOperand): Node {
+		if ($rightOperand === null) {
+			return $this->createUnaryMinusNode($leftOperand);
+		}
 
-        $leftOperand = $this->sanitize($leftOperand);
-        $rightOperand = $this->sanitize($rightOperand);
+		$leftOperand = $this->sanitize($leftOperand);
+		$rightOperand = $this->sanitize($rightOperand);
 
-        $node = $this->numericTerms($leftOperand, $rightOperand);
-        if ($node) {
-            return $node;
-        }
+		$node = $this->numericTerms($leftOperand, $rightOperand);
+		if ($node) {
+			return $node;
+		}
 
-        if ($leftOperand->compareTo($rightOperand)) {
-            return new IntegerNode(0);
-        }
+		if ($leftOperand->compareTo($rightOperand)) {
+			return new IntegerNode(0);
+		}
 
-        return new ExpressionNode($leftOperand, '-', $rightOperand);
-    }
+		return new ExpressionNode($leftOperand, '-', $rightOperand);
+	}
 
-    /** Simplify subtraction nodes for numeric operands */
-    protected function numericTerms(Node $leftOperand, Node $rightOperand): ?Node
-    {
-        if ($rightOperand instanceof NumericNode && $rightOperand->getValue() == 0) {
-            return $leftOperand;
-        }
+	/**
+	 * Create a Node representing '-$operand'
+	 *
+	 * Using some simplification rules, create a NumberNode or ExpressionNode
+	 * giving an AST correctly representing '-$operand'.
+	 *
+	 * ### Simplification rules:
+	 *
+	 * - To simplify the use of the function, convert integer params to NumberNodes
+	 * - If $operand is a NumberNodes, return a single NumberNode containing its negative
+	 * - If $operand already is a unary minus, 'x=-y', return y
+	 */
+	public function createUnaryMinusNode(Node|int|float $operand): Node {
+		$operand = $this->sanitize($operand);
 
-        if (!($leftOperand instanceof NumericNode) || !($rightOperand instanceof NumericNode)) {
-            return null;
-        }
+		if ($operand instanceof NumberNode) {
+			return new NumberNode(-$operand->getValue());
+		}
+		if ($operand instanceof IntegerNode) {
+			return new IntegerNode(-$operand->getValue());
+		}
+		if ($operand instanceof RationalNode) {
+			return new RationalNode(-$operand->getNumerator(), $operand->getDenominator());
+		}
+		// --x => x
+		if ($operand instanceof ExpressionNode && $operand->getOperator() === '-' && $operand->getRight() === null) {
+			return $operand->getLeft();
+		}
+		return new ExpressionNode($operand, '-', null);
+	}
 
-        $type = $this->resultingType($leftOperand, $rightOperand);
+	/** Simplify subtraction nodes for numeric operands */
+	protected function numericTerms(Node $leftOperand, Node $rightOperand): ?Node {
+		if ($rightOperand instanceof NumericNode && (float)$rightOperand->getValue() === 0.0) {
+			return $leftOperand;
+		}
 
-        switch ($type) {
-            case Node::NumericFloat:
-                return new NumberNode($leftOperand->getValue() - $rightOperand->getValue());
+		if (!($leftOperand instanceof NumericNode) || !($rightOperand instanceof NumericNode)) {
+			return null;
+		}
 
-            case Node::NumericRational:
-                assert($leftOperand instanceof RationalNode);
-                assert($rightOperand instanceof RationalNode);
-                $p = $leftOperand->getNumerator() * $rightOperand->getDenominator() - $leftOperand->getDenominator() * $rightOperand->getNumerator();
-                $q = $leftOperand->getDenominator() * $rightOperand->getDenominator();
-                return new RationalNode($p, $q);
+		$type = $this->resultingType($leftOperand, $rightOperand);
 
-            case Node::NumericInteger:
-                return new IntegerNode($leftOperand->getValue() - $rightOperand->getValue());
-        }
+		switch ($type) {
+			case Node::NUMERIC_FLOAT:
+				return new NumberNode($leftOperand->getValue() - $rightOperand->getValue());
 
-        return null;
-    }
+			case Node::NUMERIC_RATIONAL:
+				assert($leftOperand instanceof RationalNode);
+				assert($rightOperand instanceof RationalNode);
+				$p = $leftOperand->getNumerator() * $rightOperand->getDenominator() - $leftOperand->getDenominator() * $rightOperand->getNumerator();
+				$q = $leftOperand->getDenominator() * $rightOperand->getDenominator();
+				return new RationalNode($p, $q);
 
-    /**
-     * Create a Node representing '-$operand'
-     *
-     * Using some simplification rules, create a NumberNode or ExpressionNode
-     * giving an AST correctly representing '-$operand'.
-     *
-     * ### Simplification rules:
-     *
-     * - To simplify the use of the function, convert integer params to NumberNodes
-     * - If $operand is a NumberNodes, return a single NumberNode containing its negative
-     * - If $operand already is a unary minus, 'x=-y', return y
-     */
-    public function createUnaryMinusNode(Node|int|float $operand): Node
-    {
-        $operand = $this->sanitize($operand);
+			case Node::NUMERIC_INTEGER:
+				assert($leftOperand instanceof IntegerNode);
+				assert($rightOperand instanceof IntegerNode);
+				return new IntegerNode($leftOperand->getValue() - $rightOperand->getValue());
+		}
 
-        if ($operand instanceof NumberNode) {
-            return new NumberNode(-$operand->getValue());
-        }
-        if ($operand instanceof IntegerNode) {
-            return new IntegerNode(-$operand->getValue());
-        }
-        if ($operand instanceof RationalNode) {
-            return new RationalNode(-$operand->getNumerator(), $operand->getDenominator());
-        }
-        // --x => x
-        if ($operand instanceof ExpressionNode && $operand->getOperator() === '-' && $operand->getRight() === null) {
-            return $operand->getLeft();
-        }
-        return new ExpressionNode($operand, '-', null);
-    }
+		return null;
+	}
 }

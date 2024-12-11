@@ -15,21 +15,16 @@ namespace MathParser\Exceptions;
  * Exception thrown when parsing expressions having non-matching left and
  * right parentheses.
  */
-class ParenthesisMismatchException extends MathParserException
-{
-    /** Constructor. Create a ParenthesisMismatchException */
-    public function __construct(string $data='')
-    {
-        parent::__construct("Unable to match delimiters.");
+class ParenthesisMismatchException extends MathParserException {
+	/** Constructor. Create a ParenthesisMismatchException */
+	public function __construct(string $data='') {
+		parent::__construct('Unable to match delimiters.');
 
-        $this->data = $data;
-    }
+		$this->data = $data;
+	}
 
-    /**
-     * Get the incorrect data that was encountered.
-     */
-    public function getData(): string
-    {
-        return $this->data;
-    }
+	/** Get the incorrect data that was encountered. */
+	public function getData(): string {
+		return $this->data;
+	}
 }

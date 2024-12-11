@@ -15,21 +15,16 @@ namespace MathParser\Exceptions;
  * Exception thrown when tokenizing expressions containing illegal
  * characters.
  */
-class UnknownTokenException extends MathParserException
-{
-    /** Constructor. Create a UnknownTokenException */
-    public function __construct(string $name)
-    {
-        parent::__construct("Unknown token $name encountered");
+class UnknownTokenException extends MathParserException {
+	/** Constructor. Create a UnknownTokenException */
+	public function __construct(string $name) {
+		parent::__construct("Unknown token {$name} encountered");
 
-        $this->data = $name;
-    }
+		$this->data = $name;
+	}
 
-    /**
-     * Get the unknown token that was encountered.
-     */
-    public function getName(): string
-    {
-        return $this->data;
-    }
+	/** Get the unknown token that was encountered. */
+	public function getName(): string {
+		return $this->data;
+	}
 }

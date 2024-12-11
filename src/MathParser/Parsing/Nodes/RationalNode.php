@@ -17,104 +17,99 @@ use MathParser\Interpreting\Visitors\Visitor;
 /**
  * AST node representing a number (int or float)
  */
-class RationalNode extends NumericNode
-{
-    /**
-     * The numerator of the represented number.
-     */
-    private int $p;
-    /**
-     * The denominator of the represented number.
-     */
-    private int $q;
+class RationalNode extends NumericNode {
+	/** The numerator of the represented number. */
+	private float $p;
 
-    /**
-     * Constructor. Create a RationalNode with given value.
-     */
-    public function __construct(int $p, int $q, bool $normalize=true)
-    {
-        if ($q ==- 0) {
-            throw new DivisionByZeroException();
-        }
+	/** The denominator of the represented number. */
+	private float $q;
 
-        $this->p = $p;
-        $this->q = $q;
+	/** Constructor. Create a RationalNode with given value. */
+	public function __construct(float $p, float $q, bool $normalize=true) {
+		if ($q === -0.0 || $q === 0.0) {
+			throw new DivisionByZeroException();
+		}
 
-        if ($normalize) {
-            $this->normalize();
-        }
-    }
+		$this->p = $p;
+		$this->q = $q;
 
-    /**
-     * Returns the value
-     */
-    public function getValue(): int|float
-    {
-        return (1.0 * $this->p) / $this->q;
-    }
+		if ($normalize) {
+			$this->normalize();
+		}
+	}
 
-    public function getNumerator(): int
-    {
-        return $this->p;
-    }
+	/** Returns the value */
+	public function getValue(): float {
+		return (1.0 * $this->p) / $this->q;
+	}
 
-    public function getDenominator(): int
-    {
-        return $this->q;
-    }
+	public function getNumerator(): float {
+		return $this->p;
+	}
 
-    /**
-     * Implementing the Visitable interface.
-     */
-    public function accept(Visitor $visitor): mixed
-    {
-        return $visitor->visitRationalNode($this);
-    }
+	public function getDenominator(): float {
+		return $this->q;
+	}
 
-    /**
-     * Implementing the compareTo abstract method.
-     */
-    public function compareTo(?Node $other): bool
-    {
-        if ($other === null) {
-            return false;
-        }
-        if ($other instanceof IntegerNode) {
-            return $this->getDenominator() == 1 && $this->getNumerator() == $other->getValue();
-        }
-        if (!($other instanceof RationalNode)) {
-            return false;
-        }
+	/** Implementing the Visitable interface. */
+	public function accept(Visitor $visitor): mixed {
+		return $visitor->visitRationalNode($this);
+	}
 
-        return $this->getNumerator() == $other->getNumerator() && $this->getDenominator() == $other->getDenominator();
-    }
+	/** Implementing the compareTo abstract method. */
+	public function compareTo(?Node $other): bool {
+		if ($other === null) {
+			return false;
+		}
+		if ($other instanceof IntegerNode) {
+			return $this->getDenominator() === 1.0 && $this->getNumerator() === (float)$other->getValue();
+		}
+		if (!($other instanceof RationalNode)) {
+			return false;
+		}
 
-    private function normalize(): void
-    {
-        $a = $this->p;
-        $b = $this->q;
+		return $this->getNumerator() === $other->getNumerator() && $this->getDenominator() === $other->getDenominator();
+	}
 
-        $sign = 1;
-        if ($a < 0) {
-            $sign = -$sign;
-        }
+	private function normalize(): void {
+		if (is_nan($this->p) || is_nan($this->q)) {
+			return;
+		}
+		$a = (int)$this->p;
+		$pDigits = strrpos((string)$this->p, '.');
+		if ($pDigits !== false) {
+			$a = (int)($this->p * pow(10, $pDigits));
+		}
 
-        if ($b < 0) {
-            $sign = -$sign;
-        }
-        while ($b !== 0) {
-            $m = $a % $b;
-            $a = $b;
-            $b = $m;
-        }
+		$b = (int)$this->q;
+		$qDigits = strrpos((string)$this->q, '.');
+		if ($qDigits !== false) {
+			$b = (int)($this->q * pow(10, $qDigits));
+		}
+		$p = $a;
+		$q = $b;
 
-        $gcd = $a;
-        $this->p = intdiv($this->p, $gcd);
-        $this->q = intdiv($this->q, $gcd);
+		$sign = 1;
+		if ($a < 0) {
+			$sign = -$sign;
+		}
 
-        if ($this->q < 0) {
-            $this->q = -$this->q;
-            $this->p = -$this->p;
-        }
-    }
+		if ($b < 0) {
+			$sign = -$sign;
+		}
+		while ($b !== 0) {
+			$m = $a % $b;
+			$a = $b;
+			$b = $m;
+		}
+
+		$gcd = $a;
+		$this->p = intdiv($p, $gcd);
+		$this->q = intdiv($q, $gcd);
+
+		if ($this->q < 0) {
+			$this->q = -$this->q;
+			$this->p = -$this->p;
+		}
+	}
 }

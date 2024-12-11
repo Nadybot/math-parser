@@ -9,17 +9,9 @@ declare(strict_types=1);
 
 namespace MathParser\Interpreting;
 
-use MathParser\Exceptions\UnknownConstantException;
+use MathParser\Exceptions\{UnknownConstantException, UnknownOperatorException};
 use MathParser\Interpreting\Visitors\Visitor;
-use MathParser\Parsing\Nodes\ConstantNode;
-use MathParser\Parsing\Nodes\ExpressionNode;
-use MathParser\Parsing\Nodes\FunctionNode;
-use MathParser\Parsing\Nodes\IntegerNode;
-use MathParser\Parsing\Nodes\Node;
-use MathParser\Parsing\Nodes\NumberNode;
-use MathParser\Parsing\Nodes\NumericNode;
-use MathParser\Parsing\Nodes\RationalNode;
-use MathParser\Parsing\Nodes\VariableNode;
+use MathParser\Parsing\Nodes\{ConstantNode, ExpressionNode, FunctionNode, IntegerNode, Node, NumberNode, NumericNode, RationalNode, VariableNode};
 
 /**
  * Create LaTeX code for prettyprinting a mathematical expression
@@ -32,359 +24,344 @@ use MathParser\Parsing\Nodes\VariableNode;
  * code, and needs more work to be used in a production setting.
  *
  * ## Example:
- * ~~~{.php}
+ * ```php
  * $parser = new StdMathParser();
  * $f = $parser->parse('exp(2x)+xy');
  * printer = new LaTeXPrinter();
  * result = $f->accept($printer);    // Generates "e^{2x}+xy"
- * ~~~
+ * ```
  *
  * Note that surrounding `$`, `$$` or `\begin{equation}..\end{equation}`
  * has to be added manually.
- *
  */
-class LaTeXPrinter implements Visitor
-{
-    /**
-     * Flag to determine if division should be typeset
-     * with a solidus, e.g. x/y or a proper fraction \frac{x}{y}
-     */
-    private bool $solidus = false;
+class LaTeXPrinter implements Visitor {
+	/**
+	 * Flag to determine if division should be typeset
+	 * with a solidus, e.g. x/y or a proper fraction \frac{x}{y}
+	 */
+	private bool $solidus = false;
 
-    /**
-     * Generate LaTeX code for an ExpressionNode
-     *
-     * Create a string giving LaTeX code for an ExpressionNode `(x op y)`
-     * where `op` is one of `+`, `-`, `*`, `/` or `^`
-     *
-     * ### Typesetting rules:
-     *
-     * - Adds parentheses around each operand, if needed. (I.e. if their precedence
-     *   lower than that of the current Node.) For example, the AST `(^ (+ 1 2) 3)`
-     *   generates `(1+2)^3` but `(+ (^ 1 2) 3)` generates `1^2+3` as expected.
-     * - Multiplications are typeset implicitly `(* x y)` returns `xy` or using
-     *   `\cdot` if the first factor is a FunctionNode or the (left operand) in the
-     *   second factor is a NumberNode, so `(* x 2)` return `x \cdot 2` and `(* (sin x) x)`
-     *   return `\sin x \cdot x` (but `(* x (sin x))` returns `x\sin x`)
-     * - Divisions are typeset using `\frac`
-     * - Exponentiation adds braces around the power when needed.
-     *
-     * @param ExpressionNode $node AST to be typeset
-     */
-    public function visitExpressionNode(ExpressionNode $node): string
-    {
-        $operator = $node->getOperator();
-        $left = $node->getLeft();
-        $right = $node->getRight();
+	/**
+	 * Generate LaTeX code for an ExpressionNode
+	 *
+	 * Create a string giving LaTeX code for an ExpressionNode `(x op y)`
+	 * where `op` is one of `+`, `-`, `*`, `/` or `^`
+	 *
+	 * ### Typesetting rules:
+	 *
+	 * - Adds parentheses around each operand, if needed. (I.e. if their precedence
+	 *   lower than that of the current Node.) For example, the AST `(^ (+ 1 2) 3)`
+	 *   generates `(1+2)^3` but `(+ (^ 1 2) 3)` generates `1^2+3` as expected.
+	 * - Multiplications are typeset implicitly `(* x y)` returns `xy` or using
+	 *   `\cdot` if the first factor is a FunctionNode or the (left operand) in the
+	 *   second factor is a NumberNode, so `(* x 2)` return `x \cdot 2` and `(* (sin x) x)`
+	 *   return `\sin x \cdot x` (but `(* x (sin x))` returns `x\sin x`)
+	 * - Divisions are typeset using `\frac`
+	 * - Exponentiation adds braces around the power when needed.
+	 *
+	 * @param ExpressionNode $node AST to be typeset
+	 *
+	 * @throws UnknownOperatorException on unknown operators
+	 */
+	public function visitExpressionNode(ExpressionNode $node): string {
+		$operator = $node->getOperator();
+		$left = $node->getLeft();
+		$right = $node->getRight();
 
-        switch ($operator) {
-            case '+':
-                $leftValue = $left->accept($this);
-                $rightValue = $this->parenthesize($right, $node);
+		switch ($operator) {
+			case '+':
+				$leftValue = $left->accept($this);
+				$rightValue = $this->parenthesize($right, $node);
 
-                return "$leftValue+$rightValue";
+				return "{$leftValue}+{$rightValue}";
 
-            case '-':
-                if ($right) {
-                    // Binary minus
+			case '-':
+				if ($right) {
+					// Binary minus
 
-                    $leftValue = $left->accept($this);
-                    $rightValue = $this->parenthesize($right, $node);
+					$leftValue = $left->accept($this);
+					$rightValue = $this->parenthesize($right, $node);
 
-                    return "$leftValue-$rightValue";
-                } else {
-                    // Unary minus
+					return "{$leftValue}-{$rightValue}";
+				}
+					// Unary minus
 
-                    $leftValue = $this->parenthesize($left, $node);
+					$leftValue = $this->parenthesize($left, $node);
 
-                    return "-$leftValue";
-                }
+					return "-{$leftValue}";
 
-                // no break
-            case '*':
-                $operator = '';
-                if ($this->MultiplicationNeedsCdot($left, $right)) {
-                    $operator = '\cdot ';
-                }
-                $leftValue = $this->parenthesize($left, $node);
-                $rightValue = $this->parenthesize($right, $node);
 
-                return "$leftValue$operator$rightValue";
+				// no break
+			case '*':
+				$operator = '';
+				if ($this->multiplicationNeedsCdot($left, $right)) {
+					$operator = '\cdot ';
+				}
+				$leftValue = $this->parenthesize($left, $node);
+				$rightValue = $this->parenthesize($right, $node);
 
-            case '/':
-                if ($this->solidus) {
-                    $leftValue = $this->parenthesize($left, $node);
-                    $rightValue = $this->parenthesize($right, $node);
+				return "{$leftValue}{$operator}{$rightValue}";
 
-                    return "$leftValue$operator$rightValue";
-                }
+			case '/':
+				if ($this->solidus) {
+					$leftValue = $this->parenthesize($left, $node);
+					$rightValue = $this->parenthesize($right, $node);
 
-                return '\frac{' . $left->accept($this) . '}{' . $right->accept($this) . '}';
+					return "{$leftValue}{$operator}{$rightValue}";
+				}
 
-            case '^':
-                $leftValue = $this->parenthesize($left, $node, '', true);
+				return '\frac{' . $left->accept($this) . '}{' . $right->accept($this) . '}';
 
-                // Typeset exponents with solidus
-                $this->solidus = true;
-                $result = $leftValue . '^' . $this->bracesNeeded($right);
-                $this->solidus = false;
+			case '^':
+				$leftValue = $this->parenthesize($left, $node, '', true);
 
-                return $result;
-        }
-    }
+				// Typeset exponents with solidus
+				$this->solidus = true;
+				$result = $leftValue . '^' . $this->bracesNeeded($right);
+				$this->solidus = false;
 
-    /**
-     * Check if a multiplication needs an inserted \cdot or if
-     * it can be safely written with implicit multiplication.
-     *
-     * @param Node $left  AST of first factor
-     * @param Node $right AST of second factor
-     */
-    private function MultiplicationNeedsCdot(Node $left, Node $right): bool
-    {
-        if ($left instanceof FunctionNode) {
-            return true;
-        }
+				return $result;
+		}
+		throw new UnknownOperatorException($operator);
+	}
 
-        if ($right instanceof NumericNode) {
-            return true;
-        }
+	/**
+	 * Generate LaTeX code for a NumberNode
+	 *
+	 * Create a string giving LaTeX code for a NumberNode. Currently,
+	 * there is no special formatting of numbers.
+	 *
+	 * @param NumberNode $node AST to be typeset
+	 */
+	public function visitNumberNode(NumberNode $node): string {
+		$val = $node->getValue();
 
-        if ($right instanceof ExpressionNode && ($right->getLeft() instanceof NumericNode)) {
-            return true;
-        }
+		return "{$val}";
+	}
 
-        return false;
-    }
+	public function visitIntegerNode(IntegerNode $node): string {
+		$val = $node->getValue();
 
-    /**
-     * Generate LaTeX code for a NumberNode
-     *
-     * Create a string giving LaTeX code for a NumberNode. Currently,
-     * there is no special formatting of numbers.
-     *
-     * @param NumberNode $node AST to be typeset
-     */
-    public function visitNumberNode(NumberNode $node): string
-    {
-        $val = $node->getValue();
+		return "{$val}";
+	}
 
-        return "$val";
-    }
+	public function visitRationalNode(RationalNode $node): string {
+		$p = $node->getNumerator();
+		$q = $node->getDenominator();
 
-    public function visitIntegerNode(IntegerNode $node): string
-    {
-        $val = $node->getValue();
+		if ($q === 1.0) {
+			return "{$p}";
+		}
 
-        return "$val";
-    }
+		if ($this->solidus) {
+			return "{$p}/{$q}";
+		}
 
-    public function visitRationalNode(RationalNode $node): string
-    {
-        $p = $node->getNumerator();
-        $q = $node->getDenominator();
+		return "\\frac{{$p}}{{$q}}";
+	}
 
-        if ($q == 1) {
-            return "$p";
-        }
+	/**
+	 * Generate LaTeX code for a VariableNode
+	 *
+	 * Create a string giving LaTeX code for a VariableNode. Currently,
+	 * there is no special formatting of variables.
+	 *
+	 * @param VariableNode $node AST to be typeset
+	 */
+	public function visitVariableNode(VariableNode $node): string {
+		return $node->getName();
+	}
 
-        if ($this->solidus) {
-            return "$p/$q";
-        }
+	/**
+	 * Generate LaTeX code for a FunctionNode
+	 *
+	 * Create a string giving LaTeX code for a functionNode.
+	 *
+	 * ### Typesetting rules:
+	 *
+	 * - `sqrt(op)` is typeset as `\sqrt{op}
+	 * - `exp(op)` is either typeset as `e^{op}`, if `op` is a simple
+	 *      expression or as `\exp(op)` for more complicated operands.
+	 *
+	 * @param FunctionNode $node AST to be typeset
+	 */
+	public function visitFunctionNode(FunctionNode $node): string {
+		$functionName = $node->getName();
 
-        return "\\frac{{$p}}{{$q}}";
-    }
+		$operand = $node->getOperand()->accept($this);
 
-    /**
-     * Generate LaTeX code for a VariableNode
-     *
-     * Create a string giving LaTeX code for a VariableNode. Currently,
-     * there is no special formatting of variables.
-     *
-     * @param VariableNode $node AST to be typeset
-     */
-    public function visitVariableNode(VariableNode $node): string
-    {
-        return $node->getName();
-    }
+		switch ($functionName) {
+			case 'sqrt':
+				return "\\{$functionName}{" . $node->getOperand()->accept($this) . '}';
+			case 'exp':
+				$operand = $node->getOperand();
 
-    /**
-     * Generate LaTeX code for factorials
-     *
-     * @param FunctionNode $node AST to be typeset
-     */
-    private function visitFactorialNode(FunctionNode $node): string
-    {
-        $functionName = $node->getName();
-        $op = $node->getOperand();
-        $operand = $op->accept($this);
+				if ($operand->complexity() < 10) {
+					$this->solidus = true;
+					$result = 'e^' . $this->bracesNeeded($operand);
+					$this->solidus = false;
 
-        // Add parentheses most of the time.
-        if ($op instanceof NumericNode) {
-            if ($op->getValue() < 0) {
-                $operand = "($operand)";
-            }
-        } elseif ($op instanceof VariableNode || $op instanceof ConstantNode) {
-            // Do nothing
-        } else {
-            $operand = "($operand)";
-        }
+					return $result;
+				}
+				// Operand is complex, typset using \exp instead
 
-        return "{$operand}{$functionName}";
-    }
+				return '\exp(' . $operand->accept($this) . ')';
 
-    /**
-     * Generate LaTeX code for a FunctionNode
-     *
-     * Create a string giving LaTeX code for a functionNode.
-     *
-     * ### Typesetting rules:
-     *
-     * - `sqrt(op)` is typeset as `\sqrt{op}
-     * - `exp(op)` is either typeset as `e^{op}`, if `op` is a simple
-     *      expression or as `\exp(op)` for more complicated operands.
-     *
-     * @param FunctionNode $node AST to be typeset
-     */
+			case 'ln':
+			case 'log':
+			case 'sin':
+			case 'cos':
+			case 'tan':
+			case 'arcsin':
+			case 'arccos':
+			case 'arctan':
+				break;
 
-    public function visitFunctionNode(FunctionNode $node): string
-    {
-        $functionName = $node->getName();
+			case 'abs':
+				$operand = $node->getOperand();
 
-        $operand = $node->getOperand()->accept($this);
+				return '\lvert ' . $operand->accept($this) . '\rvert ';
 
-        switch ($functionName) {
-            case 'sqrt':
-                return "\\$functionName{" . $node->getOperand()->accept($this) . '}';
-            case 'exp':
-                $operand = $node->getOperand();
+			case '!':
+			case '!!':
+				return $this->visitFactorialNode($node);
 
-                if ($operand->complexity() < 10) {
-                    $this->solidus = true;
-                    $result = 'e^' . $this->bracesNeeded($operand);
-                    $this->solidus = false;
+			default:
+				$functionName = 'operatorname{' . $functionName . '}';
+		}
 
-                    return $result;
-                }
-                // Operand is complex, typset using \exp instead
+		return "\\{$functionName}({$operand})";
+	}
 
-                return '\exp(' . $operand->accept($this) . ')';
+	/**
+	 * Generate LaTeX code for a ConstantNode
+	 *
+	 * Create a string giving LaTeX code for a ConstantNode.
+	 * `pi` typesets as `\pi` and `e` simply as `e`.
+	 *
+	 * @param ConstantNode $node AST to be typeset
+	 *
+	 * @throws UnknownConstantException for nodes representing other constants.
+	 */
+	public function visitConstantNode(ConstantNode $node): string {
+		switch ($node->getName()) {
+			case 'pi':
+				return '\pi{}';
+			case 'e':
+				return 'e';
+			case 'i':
+				return 'i';
+			case 'NAN':
+				return '\operatorname{NAN}';
+			case 'INF':
+				return '\infty{}';
+			default:
+			throw new UnknownConstantException($node->getName());
+		}
+	}
 
-            case 'ln':
-            case 'log':
-            case 'sin':
-            case 'cos':
-            case 'tan':
-            case 'arcsin':
-            case 'arccos':
-            case 'arctan':
-                break;
+	/**
+	 *  Add parentheses to the LaTeX representation of $node if needed.
+	 *
+	 *                          node. Operands with a lower precedence have parentheses
+	 *                          added.
+	 *                          be added at the beginning of the returned string.
+	 *
+	 * @param Node           $node   The AST to typeset
+	 * @param ExpressionNode $cutoff A token representing the precedence of the parent
+	 */
+	public function parenthesize(Node $node, ExpressionNode $cutoff, string $prepend='', bool $conservative=false): string {
+		$text = $node->accept($this);
 
-            case 'abs':
-                $operand = $node->getOperand();
+		if ($node instanceof ExpressionNode) {
+			// Second term is a unary minus
+			if ($node->getOperator() === '-' && $node->getRight() === null) {
+				return "({$text})";
+			}
 
-                return '\lvert ' . $operand->accept($this) . '\rvert ';
+			if ($cutoff->getOperator() === '-' && $node->lowerPrecedenceThan($cutoff)) {
+				return "({$text})";
+			}
+			if ($node->strictlyLowerPrecedenceThan($cutoff)) {
+				return "({$text})";
+			}
 
-            case '!':
-            case '!!':
-                return $this->visitFactorialNode($node);
+			if ($conservative) {
+				// Add parentheses more liberally for / and ^ operators,
+				// so that e.g. x/(y*z) is printed correctly
+				if ($cutoff->getOperator() === '/' && $node->lowerPrecedenceThan($cutoff)) {
+					return "({$text})";
+				}
+				if ($cutoff->getOperator() === '^' && $node->getOperator() === '^') {
+					return '{' . $text . '}';
+				}
+			}
+		}
 
-            default:
-                $functionName = 'operatorname{' . $functionName . '}';
-        }
+		if (($node instanceof NumericNode) && $node->getValue() < 0) {
+			return "({$text})";
+		}
 
-        return "\\$functionName($operand)";
-    }
+		return "{$prepend}{$text}";
+	}
 
-    /**
-     * Generate LaTeX code for a ConstantNode
-     *
-     * Create a string giving LaTeX code for a ConstantNode.
-     * `pi` typesets as `\pi` and `e` simply as `e`.
-     *
-     * @param  ConstantNode             $node AST to be typeset
-     * @throws UnknownConstantException for nodes representing other constants.
-     */
-    public function visitConstantNode(ConstantNode $node): string
-    {
-        switch ($node->getName()) {
-            case 'pi':
-                return '\pi{}';
-            case 'e':
-                return 'e';
-            case 'i':
-                return 'i';
-            case 'NAN':
-                return '\operatorname{NAN}';
-            case 'INF':
-                return '\infty{}';
-            default:throw new UnknownConstantException($node->getName());
-        }
-    }
+	/**
+	 * Add curly braces around the LaTex representation of $node if needed.
+	 *
+	 * Nodes representing a single ConstantNode, VariableNode or NumberNodes (0--9)
+	 * are returned as-is. Other Nodes get curly braces around their LaTeX code.
+	 *
+	 * @param Node $node AST to parse
+	 */
+	public function bracesNeeded(Node $node): string {
+		if ($node instanceof VariableNode || $node instanceof ConstantNode) {
+			return $node->accept($this);
+		} elseif ($node instanceof IntegerNode && $node->getValue() >= 0 && $node->getValue() <= 9) {
+			return $node->accept($this);
+		}
+			return '{' . $node->accept($this) . '}';
+	}
 
-    /**
-     *  Add parentheses to the LaTeX representation of $node if needed.
-     *
-     *
-     *                          node. Operands with a lower precedence have parentheses
-     *                          added.
-     *                          be added at the beginning of the returned string.
-     * @param Node           $node     The AST to typeset
-     * @param ExpressionNode $cutoff   A token representing the precedence of the parent
-     * @param bool           $addSpace Flag determining whether an additional space should
-     */
-    public function parenthesize(Node $node, ExpressionNode $cutoff, string $prepend='', bool $conservative=false): string
-    {
-        $text = $node->accept($this);
+	/**
+	 * Check if a multiplication needs an inserted \cdot or if
+	 * it can be safely written with implicit multiplication.
+	 *
+	 * @param Node $left  AST of first factor
+	 * @param Node $right AST of second factor
+	 */
+	private function multiplicationNeedsCdot(Node $left, Node $right): bool {
+		if ($left instanceof FunctionNode) {
+			return true;
+		}
 
-        if ($node instanceof ExpressionNode) {
-            // Second term is a unary minus
-            if ($node->getOperator() == '-' && $node->getRight() == null) {
-                return "($text)";
-            }
+		if ($right instanceof NumericNode) {
+			return true;
+		}
 
-            if ($cutoff->getOperator() == '-' && $node->lowerPrecedenceThan($cutoff)) {
-                return "($text)";
-            }
-            if ($node->strictlyLowerPrecedenceThan($cutoff)) {
-                return "($text)";
-            }
+		return ($right instanceof ExpressionNode) && ($right->getLeft() instanceof NumericNode);
+	}
 
-            if ($conservative) {
-                // Add parentheses more liberally for / and ^ operators,
-                // so that e.g. x/(y*z) is printed correctly
-                if ($cutoff->getOperator() == '/' && $node->lowerPrecedenceThan($cutoff)) {
-                    return "($text)";
-                }
-                if ($cutoff->getOperator() == '^' && $node->getOperator() == '^') {
-                    return '{' . $text . '}';
-                }
-            }
-        }
+	/**
+	 * Generate LaTeX code for factorials
+	 *
+	 * @param FunctionNode $node AST to be typeset
+	 */
+	private function visitFactorialNode(FunctionNode $node): string {
+		$functionName = $node->getName();
+		$op = $node->getOperand();
+		$operand = $op->accept($this);
 
-        if (($node instanceof NumericNode) && $node->getValue() < 0) {
-            return "($text)";
-        }
+		// Add parentheses most of the time.
+		if ($op instanceof NumericNode) {
+			if ($op->getValue() < 0) {
+				$operand = "({$operand})";
+			}
+		} elseif ($op instanceof VariableNode || $op instanceof ConstantNode) {
+			// Do nothing
+		} else {
+			$operand = "({$operand})";
+		}
 
-        return "$prepend$text";
-    }
-
-    /**
-     * Add curly braces around the LaTex representation of $node if needed.
-     *
-     * Nodes representing a single ConstantNode, VariableNode or NumberNodes (0--9)
-     * are returned as-is. Other Nodes get curly braces around their LaTeX code.
-     *
-     * @param Node $node AST to parse
-     */
-    public function bracesNeeded(Node $node): string
-    {
-        if ($node instanceof VariableNode || $node instanceof ConstantNode) {
-            return $node->accept($this);
-        } elseif ($node instanceof IntegerNode && $node->getValue() >= 0 && $node->getValue() <= 9) {
-            return $node->accept($this);
-        } else {
-            return '{' . $node->accept($this) . '}';
-        }
-    }
+		return "{$operand}{$functionName}";
+	}
 }

@@ -23,12 +23,8 @@ use MathParser\Parsing\Nodes\Node;
  * Interface for construction of ExpressionNode, the
  * implementations of the interface, usually involves
  * some simplification of the operands.
- *
  */
-interface ExpressionNodeFactory
-{
-    /**
-    * Factory method to create an ExpressionNode with given operands.
-    */
-    public function makeNode(int|Node $leftOperand, int|Node $rightOperand): Node;
+interface ExpressionNodeFactory {
+	/** Factory method to create an ExpressionNode with given operands. */
+	public function makeNode(int|Node $leftOperand, int|Node $rightOperand): Node;
 }

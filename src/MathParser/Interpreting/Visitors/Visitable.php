@@ -27,7 +27,6 @@ declare(strict_types=1);
 namespace MathParser\Interpreting\Visitors;
 
 /**
- *
  * Visitable interface,
  *
  * Part of the visitor design pattern implementation. Every Node
@@ -38,22 +37,19 @@ namespace MathParser\Interpreting\Visitors;
  *
  * ### Example
  *
- * ~~~{.php}
+ * ```php
  * $node = new ExpressionNode(1, '+', 2);
  * $visitor = new TreePrinter();    // Or any other Visitor
  * $node->accept();
- * ~~~
+ * ```
  */
-interface Visitable
-{
-    /**
-     * Single function in the Visitable interface
-     *
-     * Calling the accept() function on a Visitable class,
-     * i.e. a Node (or subclass thereof) causes the supplied
-     * Visitor to traverse the AST.
-     *
-     * @param Visitor $visitor
-     **/
-    public function accept(Visitor $visitor): mixed;
+interface Visitable {
+	/**
+	 * Single function in the Visitable interface
+	 *
+	 * Calling the accept() function on a Visitable class,
+	 * i.e. a Node (or subclass thereof) causes the supplied
+	 * Visitor to traverse the AST.
+	 */
+	public function accept(Visitor $visitor): mixed;
 }

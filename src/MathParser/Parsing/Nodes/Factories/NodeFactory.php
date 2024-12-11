@@ -13,13 +13,12 @@ declare(strict_types=1);
  *
  * Classes implementing the ExpressionNodeFactory interfaces,
  * and related functionality.
- *
  */
 
 namespace MathParser\Parsing\Nodes\Factories;
 
-use MathParser\Parsing\Nodes\ExpressionNode;
-use MathParser\Parsing\Nodes\Node;
+use MathParser\Exceptions\UnknownOperatorException;
+use MathParser\Parsing\Nodes\{ExpressionNode, Node};
 
 /**
  * Helper class for creating ExpressionNodes.
@@ -30,7 +29,7 @@ use MathParser\Parsing\Nodes\Node;
  *
  * ### Examples
  *
- * ~~~{.php}
+ * ```php
  * use MathParser\Parsing\Nodes\Factories\NodeFactory;
  *
  * $factory = new NodeFactory();
@@ -39,109 +38,76 @@ use MathParser\Parsing\Nodes\Node;
  *      $factory->division(new VariableNode('x'), new VariableNode('y')),
  *      $factory->multiplication(new VariableNode('x'), new VariableNode('y'))
  * );
- * ~~~
+ * ```
  */
-class NodeFactory
-{
-    /**
-     * Factory for creating addition nodes
-     **/
-    protected AdditionNodeFactory $additionFactory;
+class NodeFactory {
+	/** Factory for creating addition nodes */
+	protected AdditionNodeFactory $additionFactory;
 
-    /**
-     * Factory for creating subtraction nodes (including unary minus)
-     **/
-    protected SubtractionNodeFactory $subtractionFactory;
+	/** Factory for creating subtraction nodes (including unary minus) */
+	protected SubtractionNodeFactory $subtractionFactory;
 
-    /**
-     * Factory for creating multiplication nodes
-     **/
-    protected MultiplicationNodeFactory $multiplicationFactory;
+	/** Factory for creating multiplication nodes */
+	protected MultiplicationNodeFactory $multiplicationFactory;
 
-    /**
-     * Factory for creating division nodes
-     **/
-    protected DivisionNodeFactory $divisionFactory;
+	/** Factory for creating division nodes */
+	protected DivisionNodeFactory $divisionFactory;
 
-    /**
-     * Factory for creating exponentiation nodes
-     **/
-    protected ExponentiationNodeFactory $exponentiationFactory;
+	/** Factory for creating exponentiation nodes */
+	protected ExponentiationNodeFactory $exponentiationFactory;
 
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->additionFactory = new AdditionNodeFactory();
-        $this->subtractionFactory = new SubtractionNodeFactory();
-        $this->multiplicationFactory = new MultiplicationNodeFactory();
-        $this->divisionFactory = new DivisionNodeFactory();
-        $this->exponentiationFactory = new ExponentiationNodeFactory();
-    }
+	/** Constructor */
+	public function __construct() {
+		$this->additionFactory = new AdditionNodeFactory();
+		$this->subtractionFactory = new SubtractionNodeFactory();
+		$this->multiplicationFactory = new MultiplicationNodeFactory();
+		$this->divisionFactory = new DivisionNodeFactory();
+		$this->exponentiationFactory = new ExponentiationNodeFactory();
+	}
 
-    /**
-     * Create an addition node representing '$leftOperand + $rightOperand'.
-     */
-    public function addition(Node|int $leftOperand, Node|int $rightOperand): Node
-    {
-        return $this->additionFactory->makeNode($leftOperand, $rightOperand);
-    }
+	/** Create an addition node representing '$leftOperand + $rightOperand'. */
+	public function addition(Node|int|float $leftOperand, Node|int|float $rightOperand): Node {
+		return $this->additionFactory->makeNode($leftOperand, $rightOperand);
+	}
 
-    /**
-     * Create a subtraction node representing '$leftOperand - $rightOperand'.
-     *
-     */
-    public function subtraction(Node|int $leftOperand, Node|int|null $rightOperand): Node
-    {
-        return $this->subtractionFactory->makeNode($leftOperand, $rightOperand);
-    }
+	/** Create a subtraction node representing '$leftOperand - $rightOperand'. */
+	public function subtraction(Node|int|float $leftOperand, null|Node|int|float $rightOperand): Node {
+		return $this->subtractionFactory->makeNode($leftOperand, $rightOperand);
+	}
 
-    /**
-     * Create a multiplication node representing '$leftOperand * $rightOperand'.
-     */
-    public function multiplication(Node|int $leftOperand, Node|int $rightOperand): Node
-    {
-        return $this->multiplicationFactory->makeNode($leftOperand, $rightOperand);
-    }
+	/** Create a multiplication node representing '$leftOperand * $rightOperand'. */
+	public function multiplication(Node|int|float $leftOperand, Node|int|float $rightOperand): Node {
+		return $this->multiplicationFactory->makeNode($leftOperand, $rightOperand);
+	}
 
-    /**
-     * Create a division node representing '$leftOperand / $rightOperand'.
-     */
-    public function division(Node|int $leftOperand, Node|int $rightOperand): Node
-    {
-        return $this->divisionFactory->makeNode($leftOperand, $rightOperand);
-    }
+	/** Create a division node representing '$leftOperand / $rightOperand'. */
+	public function division(Node|int|float $leftOperand, Node|int|float $rightOperand): Node {
+		return $this->divisionFactory->makeNode($leftOperand, $rightOperand);
+	}
 
-    /**
-     * Create an exponentiation node representing '$leftOperand ^ $rightOperand'.
-     */
-    public function exponentiation(Node|int $leftOperand, Node|int $rightOperand): Node
-    {
-        return $this->exponentiationFactory->makeNode($leftOperand, $rightOperand);
-    }
+	/** Create an exponentiation node representing '$leftOperand ^ $rightOperand'. */
+	public function exponentiation(Node|int|float $leftOperand, Node|int|float $rightOperand): Node {
+		return $this->exponentiationFactory->makeNode($leftOperand, $rightOperand);
+	}
 
-    /**
-     * Create a unary minus node representing '-$operand'.
-     */
-    public function unaryMinus(Node|int|float $operand): Node
-    {
-        return $this->subtractionFactory->createUnaryMinusNode($operand);
-    }
+	/** Create a unary minus node representing '-$operand'. */
+	public function unaryMinus(Node|int|float $operand): Node {
+		return $this->subtractionFactory->createUnaryMinusNode($operand);
+	}
 
-    /**
-     * Simplify the given ExpressionNode, using the appropriate factory.
-     *
-     * @return Node Simplified version of the input
-     */
-    public function simplify(ExpressionNode $node): Node
-    {
-        return match ($node->getOperator()) {
-            '+' => $this->addition($node->getLeft(), $node->getRight()),
-            '-' => $this->subtraction($node->getLeft(), $node->getRight()),
-            '*' => $this->multiplication($node->getLeft(), $node->getRight()),
-            '/' => $this->division($node->getLeft(), $node->getRight()),
-            '^' => $this->exponentiation($node->getLeft(), $node->getRight()),
-        };
-    }
+	/**
+	 * Simplify the given ExpressionNode, using the appropriate factory.
+	 *
+	 * @return Node Simplified version of the input
+	 */
+	public function simplify(ExpressionNode $node): Node {
+		return match ($node->getOperator()) {
+			'+' => $this->addition($node->getLeft(), $node->getRight()),
+			'-' => $this->subtraction($node->getLeft(), $node->getRight()),
+			'*' => $this->multiplication($node->getLeft(), $node->getRight()),
+			'/' => $this->division($node->getLeft(), $node->getRight()),
+			'^' => $this->exponentiation($node->getLeft(), $node->getRight()),
+			default => throw new UnknownOperatorException($node->getOperator()),
+		};
+	}
 }

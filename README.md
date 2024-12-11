@@ -20,7 +20,7 @@ The lexer and parser produces an abstract syntax tree (AST) that can be traverse
 
 It is possible to fine-tune the lexer and parser, but the library ships with a StdMathParser class, capable of tokenizing and parsing standard mathematical expressions, including arithmetical operations as well as elementary functions.
 
-~~~{.php}
+```php
 use MathParser\StdMathParser;
 use MathParser\Interpreting\Evaluator;
 
@@ -34,20 +34,20 @@ $evaluator = new Evaluator();
 
 $value = $AST->accept($evaluator);
 echo $value;
-~~~
+```
 
 More interesting example, containing variables:
 
-~~~{.php}
+```php
 $AST = $parser->parse('x+sqrt(y)');
 
 $evaluator->setVariables([ 'x' => 2, 'y' => 3 ]);
 $value = $AST->accept($evaluator);
-~~~
+```
 
 We can do other things with the AST. The library ships with a differentiator, computing the (symbolic) derivative with respect to a given variable.
 
-~~~{.php}
+```php
 use MathParser\Interpreting\Differentiator;
 
 $differentiator = new Differentiator('x');
@@ -57,7 +57,7 @@ $df = $f->accept($differentiator);
 // $df now contains the AST of '2*exp(x)-y' and can be evaluated further
 $evaluator->setVariables([ 'x' => 1, 'y' => 2 ]);
 $df->accept($evaluator);
-~~~
+```
 
 ### Implicit multiplication
 

@@ -16,30 +16,23 @@ declare(strict_types=1);
 
 namespace MathParser\Parsing\Nodes\Traits;
 
-use MathParser\Parsing\Nodes\NumberNode;
-use MathParser\Parsing\Nodes\IntegerNode;
-use MathParser\Parsing\Nodes\Node;
+use MathParser\Parsing\Nodes\{IntegerNode, Node, NumberNode};
 
 /**
  * Trait for upgrading numbers (ints and floats) to NumberNode,
  * making it possible to call the Node constructors directly
  * with numbers, making the code cleaner.
- *
  */
-trait Sanitize
-{
-    /**
-    * Convert ints and floats to NumberNodes
-    **/
-    protected function sanitize(null|Node|int|float $operand): ?Node
-    {
-        if (is_int($operand)) {
-            return new IntegerNode($operand);
-        }
-        if (is_float($operand)) {
-            return new NumberNode($operand);
-        }
+trait Sanitize {
+	/** Convert ints and floats to NumberNodes */
+	protected function sanitize(null|Node|int|float $operand): ?Node {
+		if (is_int($operand)) {
+			return new IntegerNode($operand);
+		}
+		if (is_float($operand)) {
+			return new NumberNode($operand);
+		}
 
-        return $operand;
-    }
+		return $operand;
+	}
 }

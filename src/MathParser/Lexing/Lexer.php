@@ -16,7 +16,6 @@ declare(strict_types=1);
  * [Lexical analysis](https://en.wikipedia.org/wiki/Lexical_analysis)
  * or *lexing* is the process of converting an input string into a sequence
  * of tokens, representing discrete parts of the input each carrying certain meaning.
- *
  */
 
 namespace MathParser\Lexing;
@@ -39,90 +38,88 @@ use MathParser\Exceptions\UnknownTokenException;
  * recognize `sin` as well as `sinh` as separate tokens, the more specific `sinh`
  * pattern should be added to the Lexer *before* `sin`.
  */
-class Lexer
-{
-    /**
-     * List of tokens recognized by the Lexer.
-     * @var list<TokenDefinition>
-     */
-    private array $tokenDefinitions = [];
+class Lexer {
+	/**
+	 * List of tokens recognized by the Lexer.
+	 *
+	 * @var list<TokenDefinition>
+	 */
+	private array $tokenDefinitions = [];
 
-    /**
-     * Add a Token to the list of tokens recognized by the Lexer.
-     *
-     * Adds the supplied TokenDefinition at the end of the list of known
-     * tokens.
-     *
-     * @param TokenDefinition $tokenDefinition token to add to the list of known tokens.
-     */
-    public function add(TokenDefinition $tokenDefinition): void
-    {
-        $this->tokenDefinitions[] = $tokenDefinition;
-    }
+	/**
+	 * Add a Token to the list of tokens recognized by the Lexer.
+	 *
+	 * Adds the supplied TokenDefinition at the end of the list of known
+	 * tokens.
+	 *
+	 * @param TokenDefinition $tokenDefinition token to add to the list of known tokens.
+	 */
+	public function add(TokenDefinition $tokenDefinition): void {
+		$this->tokenDefinitions[] = $tokenDefinition;
+	}
 
-    /**
-     * Convert an input string to a list of tokens.
-     *
-     * Using the list of knowns tokens, sequentially match the input string to
-     * known tokens. Note that the first matching token from the list is chosen,
-     * so if there are tokens sharing parts of the pattern (e.g. `sin` and `sinh`),
-     * care should be taken to add `sinh` before `sin`, otherwise the lexer will
-     * never match a `sinh`.
-     *
-     * @return list<Token> sequence of recognized tokens that doesn't match any knwon token.
-     * @param  string                $input  String to tokenize.
-     * @throws UnknownTokenException throwns when encountering characters in the input string
-     */
-    public function tokenize(string $input): array
-    {
-        // The list of tokens we'll eventually return
-        $tokens = [];
+	/**
+	 * Convert an input string to a list of tokens.
+	 *
+	 * Using the list of knowns tokens, sequentially match the input string to
+	 * known tokens. Note that the first matching token from the list is chosen,
+	 * so if there are tokens sharing parts of the pattern (e.g. `sin` and `sinh`),
+	 * care should be taken to add `sinh` before `sin`, otherwise the lexer will
+	 * never match a `sinh`.
+	 *
+	 * @return list<Token> sequence of recognized tokens that doesn't match any knwon token.
+	 *
+	 * @param string $input String to tokenize.
+	 *
+	 * @throws UnknownTokenException throwns when encountering characters in the input string
+	 */
+	public function tokenize(string $input): array {
+		// The list of tokens we'll eventually return
+		$tokens = [];
 
-        // The currentIndex indicates where we are inside the input string
-        $currentIndex = 0;
+		// The currentIndex indicates where we are inside the input string
+		$currentIndex = 0;
 
-        while ($currentIndex < strlen($input)) {
-            // We try to match only what is after the currentIndex,
-            // as the content before is already converted to tokens
-            $token = $this->findMatchingToken(substr($input, $currentIndex));
+		while ($currentIndex < strlen($input)) {
+			// We try to match only what is after the currentIndex,
+			// as the content before is already converted to tokens
+			$token = $this->findMatchingToken(substr($input, $currentIndex));
 
-            // If no tokens were matched, it means that the string has invalid tokens
-            // for which we did not define a token definition
-            if (!$token) {
-                throw new UnknownTokenException(substr($input, $currentIndex));
-            }
+			// If no tokens were matched, it means that the string has invalid tokens
+			// for which we did not define a token definition
+			if (!$token) {
+				throw new UnknownTokenException(substr($input, $currentIndex));
+			}
 
-            // Add the matched token to our list of token
-            $tokens[] = $token;
+			// Add the matched token to our list of token
+			$tokens[] = $token;
 
-            // Increment the string index by the lenght of the matched token,
-            // so we can now process the rest of the string.
-            $currentIndex += $token->length();
-        }
+			// Increment the string index by the lenght of the matched token,
+			// so we can now process the rest of the string.
+			$currentIndex += $token->length();
+		}
 
-        return $tokens;
-    }
+		return $tokens;
+	}
 
-    /**
-     * Find a matching token at the begining of the provided input.
-     *
-     * @return Token|null Matched token
-     * @param string $input
-     */
-    private function findMatchingToken(string $input): ?Token
-    {
-        // Check with all tokenDefinitions
-        foreach ($this->tokenDefinitions as $tokenDefinition) {
-            $token = $tokenDefinition->match($input);
+	/**
+	 * Find a matching token at the begining of the provided input.
+	 *
+	 * @return Token|null Matched token
+	 */
+	private function findMatchingToken(string $input): ?Token {
+		// Check with all tokenDefinitions
+		foreach ($this->tokenDefinitions as $tokenDefinition) {
+			$token = $tokenDefinition->match($input);
 
-            // Return the first token that was matched.
-            if ($token) {
-                return $token;
-            }
-        }
+			// Return the first token that was matched.
+			if ($token) {
+				return $token;
+			}
+		}
 
-        // Return null if no tokens were matched.
+		// Return null if no tokens were matched.
 
-        return null;
-    }
+		return null;
+	}
 }

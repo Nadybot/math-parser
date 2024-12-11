@@ -16,73 +16,58 @@ use MathParser\Interpreting\Visitors\Visitor;
 /**
  * AST node representing a function applications (e.g. sin(...))
  */
-class FunctionNode extends Node
-{
-    /** string $name Function name, e.g. 'sin' */
-    private string $name;
-    /** Node $operand AST of function operand */
-    private ?Node $operand=null;
+class FunctionNode extends Node {
+	/** string $name Function name, e.g. 'sin' */
+	private string $name;
 
-    /** Constructor, create a FunctionNode with given name and operand */
-    public function __construct(string $name, null|int|Node $operand)
-    {
-        $this->name = $name;
-        if (is_int($operand)) {
-            $operand = new NumberNode($operand);
-        }
-        $this->operand = $operand;
-    }
+	/** Node $operand AST of function operand */
+	private ?Node $operand=null;
 
-    /**
-     * Return the name of the function
-     */
-    public function getName(): string
-    {
-        return $this->name;
-    }
+	/** Constructor, create a FunctionNode with given name and operand */
+	public function __construct(string $name, null|int|Node $operand) {
+		$this->name = $name;
+		if (is_int($operand)) {
+			$operand = new NumberNode($operand);
+		}
+		$this->operand = $operand;
+	}
 
-    /**
-     * Return the operand
-     */
-    public function getOperand(): ?Node
-    {
-        return $this->operand;
-    }
+	/** Return the name of the function */
+	public function getName(): string {
+		return $this->name;
+	}
 
-    /**
-     * Set the operand
-     */
-    public function setOperand(Node $operand): Node
-    {
-        return $this->operand = $operand;
-    }
+	/** Return the operand */
+	public function getOperand(): ?Node {
+		return $this->operand;
+	}
 
-    public function getOperator(): string
-    {
-        return $this->name;
-    }
+	/** Set the operand */
+	public function setOperand(Node $operand): Node {
+		return $this->operand = $operand;
+	}
 
-    /**
-     * Implementing the Visitable interface.
-     */
-    public function accept(Visitor $visitor): mixed
-    {
-        return $visitor->visitFunctionNode($this);
-    }
+	public function getOperator(): string {
+		return $this->name;
+	}
 
-    /** Implementing the compareTo abstract method. */
-    public function compareTo(?Node $other): bool
-    {
-        if ($other === null) {
-            return false;
-        }
-        if (!($other instanceof FunctionNode)) {
-            return false;
-        }
+	/** Implementing the Visitable interface. */
+	public function accept(Visitor $visitor): mixed {
+		return $visitor->visitFunctionNode($this);
+	}
 
-        $thisOperand = $this->getOperand();
-        $otherOperand = $other->getOperand();
+	/** Implementing the compareTo abstract method. */
+	public function compareTo(?Node $other): bool {
+		if ($other === null) {
+			return false;
+		}
+		if (!($other instanceof FunctionNode)) {
+			return false;
+		}
 
-        return $this->getName() == $other->getName() && $thisOperand->compareTo($otherOperand);
-    }
+		$thisOperand = $this->getOperand();
+		$otherOperand = $other->getOperand();
+
+		return $this->getName() === $other->getName() && $thisOperand->compareTo($otherOperand);
+	}
 }
