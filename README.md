@@ -1,7 +1,8 @@
 # math-parser
 
-[![Latest Stable Version](https://poser.pugx.org/mossadal/math-parser/v/stable)](https://packagist.org/packages/mossadal/math-parser) [![Total Downloads](https://poser.pugx.org/mossadal/math-parser/downloads)](https://packagist.org/packages/mossadal/math-parser)  [![License](https://poser.pugx.org/mossadal/math-parser/license)](https://packagist.org/packages/mossadal/math-parser)
-[![Code Climate](https://codeclimate.com/github/mossadal/math-parser/badges/gpa.svg)](https://codeclimate.com/github/mossadal/math-parser)
+This is a fork from the [original math-parser](https://github.com/mossadal/math-parser) that's adapted to fit the need of my own projects. Please don't use it without talking to me, because it might behave in unexpected ways.
+
+The codebase was modified to work with PHP 8.1+, and adhere to the coding styles of my projects.
 
 ## DESCRIPTION
 
@@ -66,11 +67,9 @@ Note that implicit multiplication has the same precedence as explicit multiplica
 
 To make full use of implicit multiplication, the standard lexer only allows one-letter variables. (Otherwise, we wouldn't know if `xy` should be parsed as `x*y` or as the single variable `xy`).
 
-## DOCUMENTATION
-
-For complete documentation, see the [github.io project page](http://mossadal.github.io/math-parser/index.html)
-
 ## THANKS
+
+The original math-parser library was coded by [Frank Wikström](https://github.com/mossadal.)
 
 The Lexer is based on the lexer described by Marc-Oliver Fiset in his [blog](http://marcofiset.com/programming-language-implementation-part-1-lexer/).
 
