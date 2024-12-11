@@ -15,7 +15,6 @@ The lexer and parser produces an abstract syntax tree (AST) that can be traverse
 * a differentiator transforming the AST into a (somewhat) simplied AST representing the derivative of the supplied expression.
 * a rudimentary LaTeX output generator, useful for pretty printing expressions using MathJax
 
-
 ## EXAMPLES
 
 It is possible to fine-tune the lexer and parser, but the library ships with a StdMathParser class, capable of tokenizing and parsing standard mathematical expressions, including arithmetical operations as well as elementary functions.
