@@ -2,7 +2,7 @@ name: Check static code analysis
 on: [push, pull_request]
 
 jobs:
-  phpstan-check:
+  phpunit-tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -13,9 +13,9 @@ jobs:
         with:
           php-version: 8.1.17
           coverage: none
-      - name: Run style checker
+      - name: Run tests
         shell: bash
         run: |
           composer install -q
           composer dumpautoload
-          "$(composer config vendor-dir)/phpstan/phpstan/phpstan.phar" --no-progress -n --no-ansi
+          "$(composer config vendor-dir)/bin/phpunit" --stop-on-failure -c phpunit.xml
