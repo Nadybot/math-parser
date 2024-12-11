@@ -1,14 +1,19 @@
 {
-    "name": "mossadal/math-parser",
+    "name": "nadybot/math-parser",
     "description": "PHP parser for mathematical expressions, including elementary functions, variables and implicit multiplication. Also supports symbolic differentiation.",
     "keywords": ["parser", "mathematics" ],
-    "homepage": "https://github.com/mossadal/math-parser",
+    "homepage": "https://github.com/Nadybot/math-parser",
     "license": "LGPL-3.0",
     "authors": [
         {
+            "name": "Nadyita",
+            "email": "nadyita@hodorraid.org",
+            "role": "Maintainer"
+        },
+        {
             "name": "Frank Wikström",
             "email": "frank@mossadal.se",
-            "role": "Developer"
+            "role": "Original Author"
         }
     ],
     "require": {
