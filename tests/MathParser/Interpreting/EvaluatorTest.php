@@ -68,6 +68,19 @@ class EvaluatorTest extends TestCase {
 		$this->assertResult('-x', -$this->variables['x']);
 	}
 
+	public function testCanEvaluateSignedOperators() {
+		$x = $this->variables['x'];
+		$this->assertResult('x*-5', $x * -5);
+		$this->assertResult('-x*-5', -$x * -5);
+		$this->assertResult('x--5', $x + 5);
+		$this->assertResult('x-+5', $x - 5);
+		$this->assertResult('x^-1', 1/$x);
+		$this->assertResult('x/-2', $x/-2);
+		$this->assertResult('x/+2', $x/2);
+		$this->assertResult('x++2', $x+2);
+		$this->assertResult('x+-2', $x-2);
+	}
+
 	public function testCanEvaluateMultiplication() {
 		$x = $this->variables['x'];
 		$this->assertResult('3*x', 3 * $x);

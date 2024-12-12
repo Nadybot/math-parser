@@ -95,6 +95,7 @@ class Parser {
 	public function parse(array $tokens): Node {
 		// Filter away any whitespace
 		$tokens = $this->filterTokens($tokens);
+		$tokens = $this->parseSignedNumbers($tokens);
 
 		// Insert missing implicit multiplication tokens
 		if (static::allowImplicitMultiplication()) {
@@ -216,7 +217,7 @@ class Parser {
 	/**
 	 * Insert multiplication tokens where needed (taking care of implicit mulitplication).
 	 *
-	 * @param Token[] $tokens Input list of tokens
+	 * @param list<Token> $tokens Input list of tokens
 	 *
 	 * @return list<Token>
 	 */
@@ -228,6 +229,55 @@ class Parser {
 				$result[] = new Token('*', TokenType::MultiplicationOperator);
 			}
 			$lastToken = $token;
+			$result[] = $token;
+		}
+		return $result;
+	}
+
+	/**
+	 * Make `-`/`+` followed by a number a negative number if needed
+	 *
+	 * @param list<Token> $tokens Input list of tokens
+	 *
+	 * @return list<Token>
+	 */
+	protected function parseSignedNumbers(array $tokens): array {
+		$result = [];
+		for ($i = 0; $i < count($tokens); $i++) {
+			$token = $tokens[$i];
+			$type = $token->getType();
+			$isNumber = in_array($type, [TokenType::PosInt, TokenType::Integer, TokenType::RealNumber], true);
+			if ($i < 2 || !$isNumber) {
+				$result[] = $token;
+				continue;
+			}
+			$prePreType = $tokens[$i-2]->getType();
+			$preType = $tokens[$i-1]->getType();
+			$prePreIsOperator = in_array($prePreType, [
+				TokenType::DivisionOperator,
+				TokenType::MultiplicationOperator,
+				TokenType::AdditionOperator,
+				TokenType::SubtractionOperator,
+				TokenType::ExponentiationOperator,
+			], true);
+			$preIsSign = in_array($preType, [
+				TokenType::AdditionOperator,
+				TokenType::SubtractionOperator,
+			], true);
+			if ($prePreIsOperator && $preIsSign) {
+				array_pop($result);
+				if ($preType === TokenType::SubtractionOperator) {
+					switch ($type) {
+						case TokenType::PosInt:
+						case TokenType::Integer:
+							$token = new Token((string)(-1 * (int)$token->getValue()), TokenType::Integer);
+							break;
+						case TokenType::RealNumber:
+							$token = new Token((string)(-1 * (float)$token->getValue()), TokenType::RealNumber);
+							break;
+					}
+				}
+			}
 			$result[] = $token;
 		}
 		return $result;
