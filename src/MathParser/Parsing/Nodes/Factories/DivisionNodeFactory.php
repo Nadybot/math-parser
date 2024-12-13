@@ -85,8 +85,6 @@ class DivisionNodeFactory implements ExpressionNodeFactoryInterface {
 
 			case NodeOrder::Rational:
 			case NodeOrder::Integer:
-				assert($leftOperand instanceof IntegerNode || $leftOperand instanceof RationalNode);
-				assert($rightOperand instanceof IntegerNode || $rightOperand instanceof RationalNode);
 				$p = $leftOperand->getNumerator() * $rightOperand->getDenominator();
 				$q = $leftOperand->getDenominator() * $rightOperand->getNumerator();
 				return new RationalNode($p, $q);

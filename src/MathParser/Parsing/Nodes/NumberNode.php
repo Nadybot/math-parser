@@ -30,6 +30,14 @@ class NumberNode extends NumericNode {
 		return $this->value;
 	}
 
+	public function getNumerator(): int|float {
+		return $this->value;
+	}
+
+	public function getDenominator(): int {
+		return 1;
+	}
+
 	/** Implementing the Visitable interface. */
 	public function accept(VisitorInterface $visitor): mixed {
 		return $visitor->visitNumberNode($this);

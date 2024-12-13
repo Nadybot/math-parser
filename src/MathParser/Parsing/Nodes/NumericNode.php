@@ -10,4 +10,8 @@ namespace MathParser\Parsing\Nodes;
 abstract class NumericNode extends Node {
 	/** Returns the value */
 	abstract public function getValue(): int|float;
+
+	abstract public function getNumerator(): int|float;
+
+	abstract public function getDenominator(): int|float;
 }

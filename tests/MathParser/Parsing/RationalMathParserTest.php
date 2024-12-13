@@ -7,7 +7,7 @@ use MathParser\Interpreting\TreePrinter;
 use MathParser\Lexing\{Token, TokenType};
 use MathParser\Parsing\Nodes\Factories\NodeFactory;
 use MathParser\Parsing\Nodes\{ConstantNode, ExpressionNode, IntegerNode, NumberNode, RationalNode, VariableNode};
-use MathParser\RationalMathParser;
+use MathParser\{RationalMathParser};
 use PHPUnit\Framework\TestCase;
 
 class RationalMathParserTest extends TestCase {
@@ -612,6 +612,32 @@ class RationalMathParserTest extends TestCase {
 		$op1 = $this->factory->subtraction(new VariableNode('x'), null);
 		$node = $this->factory->subtraction($op1, null);
 		$shouldBe = new VariableNode('x');
+		$this->assertNodesEqual($node, $shouldBe);
+	}
+
+	public function testCanSimplify() {
+		$node = new RationalNode(2, 3);
+		$shouldBe = $this->parser->parse('1/3+1/3');
+		$this->assertNodesEqual($node, $shouldBe);
+
+		$node = $this->factory->addition(new RationalNode(1, 3), new IntegerNode(1));
+		$shouldBe = $this->parser->parse('1/3+1');
+		$this->assertNodesEqual($node, $shouldBe);
+
+		$node = new RationalNode(2, 3);
+		$shouldBe = $this->parser->parse('1/3*2');
+		$this->assertNodesEqual($node, $shouldBe);
+
+		$node = new IntegerNode(1);
+		$shouldBe = $this->parser->parse('1/3*3');
+		$this->assertNodesEqual($node, $shouldBe);
+
+		$node = new IntegerNode(1);
+		$shouldBe = $this->parser->parse('4/3 - 1/3');
+		$this->assertNodesEqual($node, $shouldBe);
+
+		$node = new RationalNode(1, 8);
+		$shouldBe = $this->parser->parse('10/80');
 		$this->assertNodesEqual($node, $shouldBe);
 	}
 

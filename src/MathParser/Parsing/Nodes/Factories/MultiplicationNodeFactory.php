@@ -82,8 +82,6 @@ class MultiplicationNodeFactory implements ExpressionNodeFactoryInterface {
 				return new NumberNode($leftOperand->getValue() * $rightOperand->getValue());
 
 			case NodeOrder::Rational:
-				assert($leftOperand instanceof RationalNode);
-				assert($rightOperand instanceof RationalNode);
 				$p = $leftOperand->getNumerator() * $rightOperand->getNumerator();
 				$q = $leftOperand->getDenominator() * $rightOperand->getDenominator();
 				return new RationalNode($p, $q);
